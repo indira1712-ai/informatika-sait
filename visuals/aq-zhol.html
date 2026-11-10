@@ -1,0 +1,372 @@
+<!doctype html><html lang="kk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ақ жол — JOL</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#29234d;background:linear-gradient(135deg,#fff0f7,#fff7d6,#dff9ff,#eee7ff);min-height:100vh;background-attachment:fixed}
+.wrap{max-width:920px;margin:auto;padding:24px}.card{background:#fffffff2;border-radius:26px;padding:28px;margin:18px 0;box-shadow:0 14px 40px #6d28d91c}
+h1{font-size:36px;margin:8px 0;background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);-webkit-background-clip:text;color:transparent}.muted{color:#6b6686;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.tile{padding:22px;border-radius:20px;background:linear-gradient(135deg,#f5f3ff,#fdf2f8,#fffbeb);cursor:pointer}.tile b{font-size:18px}
+button{border:0;border-radius:13px;padding:13px 17px;font-weight:700;cursor:pointer}.primary{background:linear-gradient(90deg,#7c3aed,#ec4899,#f97316);color:white}.back{background:#eef2ff;color:#4338ca}
+input,select,textarea{width:100%;padding:12px;margin:6px 0 10px;border:1px solid #ddd6fe;border-radius:11px;font-size:15px}textarea{min-height:80px}.hidden{display:none}
+.choice{display:block;width:100%;text-align:left;background:#eef2ff;color:#312e81;margin:8px 0}.ok{background:#dcfce7;color:#166534;padding:11px;border-radius:11px;margin:8px 0}.err{background:#fee2e2;color:#991b1b;padding:11px;border-radius:11px;margin:8px 0}
+.progress{height:10px;background:#eee;border-radius:20px;overflow:hidden;margin:15px 0}.bar{height:100%;background:linear-gradient(90deg,#06b6d4,#7c3aed,#ec4899);width:0}
+.scoreline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee}footer{text-align:center;padding:20px;color:#6b6686;line-height:1.7}
+</style></head><body><a href="/#aq-zhol" style="display:inline-block;margin:16px 24px;color:#4338ca">← Мұғалім сайтына оралу</a><div class="wrap">
+<section id="home" class="card"><span>11-сынып • ғылыми жоба</span><h1>JOL — болашаққа бағыт</h1><p class="muted">Мамандық таңдау, ҰБТ тесттері және педагогтың ортақ сұрақтар базасы — бір платформада.</p>
+<div class="grid"><div class="tile" onclick="careerStart()"><b>🎯 Мамандық таңдау</b><p>32 сұрақ • 8 бағыт</p></div><div class="tile" onclick="show('student')"><b>📝 ҰБТ тесті</b><p>10 пән • әр пәннен 10 сұрақ</p></div><div class="tile" onclick="show('assessment');assessmentInit()"><b>📚 БЖБ • ТЖБ • аралық бақылау</b><p>Информатика және цифрлық сауаттылық</p></div><div class="tile" onclick="show('login')"><b>👩‍🏫 Педагог кабинеті</b><p>Сұрақтарды Supabase-қа қосу</p></div></div></section>
+
+<section id="career" class="card hidden"><button class="back" onclick="show('home')">← Артқа</button><div id="cCounter"></div><div class="progress"><div id="cBar" class="bar"></div></div><h2 id="cQ"></h2><button class="choice" onclick="cAnswer(2)">Иә</button><button class="choice" onclick="cAnswer(1)">Кейде / Білмеймін</button><button class="choice" onclick="cAnswer(0)">Жоқ</button></section>
+<section id="careerResult" class="card hidden"><button class="back" onclick="show('home')">← Басты бет</button><h2>🎯 Мамандық тестінің нәтижесі</h2><div id="cOut"></div><button class="primary" onclick="careerStart()">Қайта өту</button></section>
+
+<section id="login" class="card hidden"><button class="back" onclick="show('home')">← Артқа</button><h2>Педагог кіруі</h2><input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Құпиясөз"><button class="primary" onclick="login()">Кіру</button> <button class="back" onclick="requestPasswordReset()">Құпиясөзді ұмыттым</button><div id="lm"></div></section>
+<section id="resetPassword" class="card hidden"><h2>Жаңа құпиясөз</h2><p class="muted">Поштаға келген қалпына келтіру сілтемесі арқылы жаңа құпиясөз орнатыңыз.</p><input id="newPassword" type="password" autocomplete="new-password" placeholder="Жаңа құпиясөз (кемінде 8 таңба)"><button class="primary" onclick="updatePassword()">Құпиясөзді сақтау</button><div id="resetMsg"></div></section>
+<section id="teacher" class="card hidden"><button class="back" onclick="logout()">Шығу</button><h2>👩‍🏫 Педагог кабинеті</h2>
+<select id="sub"><option>Қазақстан тарихы</option><option>Оқу сауаттылығы</option><option>Математикалық сауаттылық</option><option>Математика</option><option>Физика</option><option>Информатика</option><option>Биология</option><option>Химия</option><option>География</option><option>Қазақ тілі</option></select>
+<div class="card" style="background:#f5f3ff;padding:15px"><b>Бағалау жұмысына сұрақ қосу</b><p class="muted">Пәнді, сыныпты және жұмыс түрін белгілеңіз. Бір сұрақ = 1 балл; 10 сұрақ енгізсеңіз, жұмыс 10 балл болады.</p><select id="asub"><option>Информатика</option><option>Жасанды интеллект және информатика</option><option>Жасанды интеллект және цифрлық сауаттылық</option></select><select id="agrade"><option value="">Сыныпты таңдаңыз</option></select><select id="atype"><option value="">Жұмыс түрін таңдаңыз</option><option>БЖБ</option><option>ТЖБ</option><option>Аралық бақылау</option></select><input id="aunit" placeholder="Бөлім / тақырып (мысалы, Ақпаратты өлшеу)"><input id="avariant" placeholder="Нұсқа (мысалы, 1 немесе 2)"><label><input type="checkbox" id="assessmentMode" style="width:auto"> Осы сұрақты бағалау жұмысына қосу</label></div><input id="top" placeholder="Тақырып"><select id="dif"><option>Жеңіл</option><option>Орташа</option><option>Күрделі</option></select><textarea id="qt" placeholder="Сұрақ"></textarea><input id="aa" placeholder="A жауабы"><input id="ab" placeholder="B жауабы"><input id="ac" placeholder="C жауабы"><input id="ad" placeholder="D жауабы"><input id="ae" placeholder="E жауабы (міндетті емес)"><input id="af" placeholder="F жауабы (міндетті емес)"><input id="cor" placeholder="Дұрыс жауап: A немесе бірнешеуі A,C,E"><input id="tn" value="Жумагазина И." placeholder="Педагог"><button class="primary" onclick="addQ()">Сұрақты сақтау</button> <button class="back" onclick="loadResults()">📊 Оқушылар нәтижелері</button><div id="am"></div><div id="resultsBox"></div></section>
+
+<section id="student" class="card hidden"><button class="back" onclick="show('home')">← Артқа</button><h2>📝 ҰБТ тесті</h2><p class="muted">Пәндер бойынша дайындыққа арналған базалық жаттығу тесттері. Әр пәнде 10 сұрақ, әр дұрыс жауап — 1 балл.</p><div id="setup"><input id="studentName" placeholder="Оқушының аты-жөні"><label for="testSource">Тест көзі</label><select id="testSource" onchange="subjects()"><option value="practice">Дайын пәндік тесттер</option><option value="online">Мұғалімнің онлайн базасы</option></select><label for="ts">Пән</label><select id="ts"></select><label for="tc">Сұрақ саны</label><select id="tc"><option selected>10</option></select><button class="primary" onclick="startUT()">Бастау</button><div id="sm"></div></div><div id="quiz" class="hidden"><b id="cnt"></b><h2 id="qq"></h2><div id="ans"></div></div><div id="res" class="hidden"></div></section>
+<section id="assessment" class="card hidden"><button class="back" onclick="show('home')">← Артқа</button><h2>📚 БЖБ • ТЖБ • аралық бақылау</h2><p class="muted">6-сынып • «Аппараттық және бағдарламалық қамтамасыз ету»: БЖБ екі нұсқада дайын (әр нұсқа 10 тапсырма, 14 балл, 25 минут). Оқу мақсаттарына сәйкестігін педагог өз КТЖ-сы бойынша тексереді.</p><input id="assessmentStudent" placeholder="Оқушының аты-жөні"><select id="assessmentSubject"><option>Информатика</option><option>Жасанды интеллект және информатика</option><option>Жасанды интеллект және цифрлық сауаттылық</option></select><select id="assessmentGrade"></select><select id="assessmentType"><option>БЖБ</option><option>ТЖБ</option><option>Аралық бақылау</option></select><button class="primary" onclick="assessmentLoad()">Жұмыстарды көрсету</button><div id="assessmentList"></div><div id="assessmentQuiz" class="hidden"><div id="assessmentPaperHeader" style="line-height:1.7;margin-bottom:16px"></div><b id="assessmentCounter"></b><h3 id="assessmentQuestion"></h3><div id="assessmentAnswers"></div></div><div id="assessmentResult"></div></section>
+
+<footer><b>Автор: Қабылжанова Ж.</b><br><b>Жетекші: Жумагазина И.</b><br>JOL • Ғылыми жоба</footer></div>
+<script>
+const connectionError={message:"Онлайн базаға қосылу мүмкін болмады. Интернетті тексеріп, бетті жаңартыңыз. Дайын БЖБ мен мамандық тестін қолдана аласыз."};
+function offlineQuery(){return new Proxy({}, {get(_,key){if(key==='then')return resolve=>Promise.resolve({data:[],error:connectionError}).then(resolve);return ()=>offlineQuery()}})}
+const offlineAuth={onAuthStateChange(){},signInWithPassword:async()=>({error:connectionError}),resetPasswordForEmail:async()=>({error:connectionError}),updateUser:async()=>({error:connectionError}),signOut:async()=>({error:null})};
+let db={from:offlineQuery,auth:offlineAuth};
+const databaseLibrary=document.createElement('script');databaseLibrary.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';databaseLibrary.async=true;
+databaseLibrary.onload=()=>{try{db=window.supabase.createClient("https://agnvbilkjhdlqmzqukpj.supabase.co","sb_publishable_Oeg1WTM6nGeLePNdOo1FsQ_qmCZ9TXu");db.auth.onAuthStateChange(event=>{if(event==='PASSWORD_RECOVERY')show('resetPassword')})}catch(e){console.warn('Онлайн база қолжетімсіз')}};
+document.head.appendChild(databaseLibrary);
+function show(x){document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));document.getElementById(x).classList.remove("hidden");if(x==="student")subjects()}
+const CQ=[["Компьютермен жұмыс істегенді ұнатасың ба?", "IT және техника"], ["Бағдарлама немесе сайт жасағың келе ме?", "IT және техника"], ["Математика және логикалық есептер ұнай ма?", "IT және техника"], ["Техниканың жұмысын зерттеу қызықты ма?", "IT және техника"], ["Биология пәні ұнай ма?", "Медицина"], ["Адамдарға медициналық көмек көрсеткің келе ме?", "Медицина"], ["Химияға қызығасың ба?", "Медицина"], ["Адам ағзасын зерттеу қызықты ма?", "Медицина"], ["Басқаларға түсіндіргенді ұнатасың ба?", "Педагогика"], ["Балалармен жұмыс істегің келе ме?", "Педагогика"], ["Адамдарды тыңдап, көмектескен ұнай ма?", "Педагогика"], ["Біліміңді басқалармен бөліскің келе ме?", "Педагогика"], ["Сурет немесе дизайн ұнай ма?", "Шығармашылық"], ["Фото немесе видео түсірген ұнай ма?", "Шығармашылық"], ["Жаңа идея ойлап тапқан ұнай ма?", "Шығармашылық"], ["Мәтін немесе мақала жазған ұнай ма?", "Шығармашылық"], ["Ақшаны жоспарлау қызықты ма?", "Экономика және бизнес"], ["Өз кәсібіңді ашқың келе ме?", "Экономика және бизнес"], ["Ұйымдастыру және басқару ұнай ма?", "Экономика және бизнес"], ["Сауда мен жарнама қызықты ма?", "Экономика және бизнес"], ["Заңдар мен құқықтарды білу қызықты ма?", "Құқық"], ["Әділдік пен құқық қорғауға қызығасың ба?", "Құқық"], ["Ресми құжаттармен жұмыс ұнай ма?", "Құқық"], ["Қоғамдық мәселелерді талқылау қызықты ма?", "Құқық"], ["Спортпен тұрақты айналысасың ба?", "Спорт"], ["Басқаларға жаттығу үйреткің келе ме?", "Спорт"], ["Спорт жарыстарына қызығасың ба?", "Спорт"], ["Белсенді қозғалыстағы жұмысты қалайсың ба?", "Спорт"], ["Жануарлар мен өсімдіктерге қамқорлық ұнай ма?", "Ауыл шаруашылығы және табиғат"], ["Табиғатты қорғауға қызығасың ба?", "Ауыл шаруашылығы және табиғат"], ["Егіншілік немесе ауыл техникасы қызықты ма?", "Ауыл шаруашылығы және табиғат"], ["Жануарларды емдеу қызықты ма?", "Ауыл шаруашылығы және табиғат"]], JOBS={"IT және техника": "Бағдарламашы, веб-әзірлеуші, киберқауіпсіздік маманы, инженер, деректер талдаушы", "Медицина": "Дәрігер, стоматолог, фармацевт, мейіргер, зертхана маманы", "Педагогика": "Мұғалім, педагог-психолог, логопед, әлеуметтік педагог, тәрбиеші", "Шығармашылық": "Дизайнер, сәулетші, фотограф, журналист, контент жасаушы", "Экономика және бизнес": "Экономист, бухгалтер, қаржыгер, маркетолог, менеджер", "Құқық": "Заңгер, адвокат, нотариус, мемлекеттік қызметші, прокурор", "Спорт": "Жаттықтырушы, дене шынықтыру мұғалімі, фитнес-тренер, спорт менеджері", "Ауыл шаруашылығы және табиғат": "Агроном, ветеринар, эколог, зоотехник, ауыл шаруашылығы инженері"};let ci=0,cs={};
+function careerStart(){ci=0;cs={};Object.keys(JOBS).forEach(k=>cs[k]=0);show("career");showCareerQ()}
+function showCareerQ(){cCounter.textContent=(ci+1)+" / "+CQ.length;cBar.style.width=(ci/CQ.length*100)+"%";cQ.textContent=CQ[ci][0]}
+function cAnswer(p){cs[CQ[ci][1]]+=p;ci++;if(ci<CQ.length)showCareerQ();else careerFinish()}
+function careerFinish(){show("careerResult");let max=Math.max(...Object.values(cs)),best=Object.keys(cs).filter(k=>cs[k]===max);let h="<h2>Сізге сәйкес бағыт: "+best.join(", ")+"</h2>";best.forEach(k=>h+="<p><b>"+k+"</b><br>"+JOBS[k]+"</p>");h+="<h3>Барлық бағыт бойынша ұпай</h3>";Object.entries(cs).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>h+='<div class="scoreline"><span>'+k+'</span><b>'+v+' / 8</b></div>');cOut.innerHTML=h}
+async function login(){let r=await db.auth.signInWithPassword({email:em.value,password:pw.value});if(r.error)lm.innerHTML='<div class="err">'+r.error.message+'</div>';else show("teacher")}
+async function requestPasswordReset(){let email=em.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){lm.textContent="Алдымен тіркелген email мекенжайыңызды енгізіңіз.";return}lm.textContent="Хат жіберілуде...";let redirectTo=location.protocol==="https:"||location.protocol==="http:"?location.origin+location.pathname:undefined;let {error}=await db.auth.resetPasswordForEmail(email,redirectTo?{redirectTo}:{});lm.textContent=error?"Хат жіберілмеді: "+error.message:"Егер бұл email тіркелген болса, қалпына келтіру сілтемесі поштаңызға келеді. Спам бумасын да қараңыз."}
+async function updatePassword(){if(newPassword.value.length<8){resetMsg.textContent="Кемінде 8 таңба енгізіңіз.";return}let {error}=await db.auth.updateUser({password:newPassword.value});if(error){resetMsg.textContent="Сақталмады: "+error.message;return}newPassword.value="";resetMsg.textContent="Құпиясөз жаңартылды. Енді жаңа құпиясөзбен кіріңіз.";await db.auth.signOut()}
+db.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY")show("resetPassword")});
+async function logout(){await db.auth.signOut();show("home")}
+async function addQ(){if(assessmentMode.checked && (!agrade.value||!atype.value||!aunit.value.trim()||!avariant.value.trim())){am.innerHTML='<div class="err">Сыныпты, жұмыс түрін, бөлімді және нұсқаны толтырыңыз.</div>';return}if(assessmentMode.checked) {sub.value=asub.value;top.value=assessmentTag(agrade.value,atype.value,aunit.value,avariant.value)}if(!qt.value||!aa.value||!ab.value||!ac.value||!ad.value){am.innerHTML='<div class="err">Барлық жолды толтырыңыз.</div>';return}let r=await db.from("questions").insert({subject:sub.value,topic:top.value,difficulty:dif.value,question:qt.value,answer_a:aa.value,answer_b:ab.value,answer_c:ac.value,answer_d:ad.value,answer_e:ae.value||null,answer_f:af.value||null,correct_answer:cor.value.toUpperCase().replace(/\s/g,""),teacher:tn.value});am.innerHTML=r.error?'<div class="err">'+r.error.message+'</div>':'<div class="ok">Сұрақ ортақ базаға сақталды ✓</div>'}
+async function subjects(){let r=await db.from("questions").select("subject");if(r.error){sm.innerHTML='<div class="err">'+r.error.message+'</div>';return}let s=[...new Set((r.data||[]).map(x=>x.subject))];ts.innerHTML=s.map(x=>'<option>'+x+'</option>').join("");sm.innerHTML=s.length?'':'<div class="err">Базада сұрақ жоқ.</div>'}
+function sh(a){return [...a].sort(()=>Math.random()-.5)}let test=[],i=0,score=0;
+async function startUT(){if(!studentName.value.trim()){sm.innerHTML='<div class="err">Оқушының аты-жөнін енгізіңіз.</div>';return}window.currentStudent=studentName.value.trim();window.currentSubject=ts.value;let r=await db.from("questions").select("*").eq("subject",ts.value);if(r.error||!r.data?.length){sm.innerHTML='<div class="err">Сұрақ табылмады.</div>';return}test=sh(r.data).slice(0,Math.min(+tc.value,r.data.length));i=0;score=0;setup.classList.add("hidden");quiz.classList.remove("hidden");showUT()}
+function showUT(){let x=test[i];let correct=String(x.correct_answer||"").toUpperCase().split(/[,; ]+/).filter(Boolean);let o=[["A",x.answer_a],["B",x.answer_b],["C",x.answer_c],["D",x.answer_d],["E",x.answer_e],["F",x.answer_f]].filter(z=>z[1]).map(z=>({k:z[0],t:z[1]}));o=sh(o);cnt.textContent=(i+1)+" / "+test.length;qq.textContent=x.question;if(correct.length<=1){ans.innerHTML=o.map(z=>'<button class="choice" onclick="pick('+(correct.includes(z.k))+')">'+z.k+') '+z.t+'</button>').join("")}else{ans.innerHTML=o.map(z=>'<label class="choice"><input type="checkbox" name="multi" value="'+z.k+'" style="width:auto;margin-right:8px">'+z.k+') '+z.t+'</label>').join("")+'<button class="primary" onclick="pickMulti()">Жауап беру</button>';window.currentCorrect=correct}}
+function pickMulti(){let chosen=[...document.querySelectorAll('input[name="multi"]:checked')].map(x=>x.value).sort();let correct=[...(window.currentCorrect||[])].sort();pick(chosen.length===correct.length&&chosen.every((v,j)=>v===correct[j]))}
+function pick(ok){if(ok)score++;i++;if(i<test.length)showUT();else{quiz.classList.add("hidden");res.classList.remove("hidden");let pct=Math.round(score/test.length*100);res.innerHTML='<h2>Нәтиже: '+score+' / '+test.length+'</h2><p>'+pct+'%</p><div id="saveResultMsg"></div><button class="primary" onclick="location.reload()">Қайта бастау</button>';saveResult(score,test.length,pct)}}
+
+async function saveResult(score,total,percentage){
+  let r=await db.from("results").insert({
+    student_name:window.currentStudent,
+    subject:window.currentSubject,
+    score:score,total:total,percentage:percentage
+  });
+  let el=document.getElementById("saveResultMsg");
+  if(el) el.innerHTML=r.error?'<div class="err">Нәтиже сақталмады: '+r.error.message+'</div>':'<div class="ok">Нәтиже базаға сақталды ✓</div>';
+}
+async function loadResults(){
+  let r=await db.from("results").select("*").order("created_at",{ascending:false});
+  if(r.error){resultsBox.innerHTML='<div class="err">'+r.error.message+'</div>';return}
+  let rows=r.data||[];
+  if(!rows.length){resultsBox.innerHTML='<p>Әзірге нәтиже жоқ.</p>';return}
+  resultsBox.innerHTML='<h3>📊 Оқушылар нәтижелері</h3>'+rows.map(x=>'<div class="scoreline"><span><b>'+x.student_name+'</b> — '+x.subject+'</span><b>'+x.score+'/'+x.total+' ('+x.percentage+'%)</b></div>').join('');
+}
+
+const AS_PREFIX="JOL-AS1|";
+// Әдістемелік үлгі: әр сұрақ 1 балл. Ресми оқу мақсатының коды берілмеген.
+const builtInBJB=[
+  {variant:"1",items:
+[
+  [
+    "ЖИ берген жауапта күмәнді дерек болса, дұрыс әрекет қандай?",
+    "Тексермей көшіру",
+    "Сенімді дереккөзден тексеру",
+    "Барлығына бірден жіберу",
+    "Жеке деректерді қосу",
+    "B"
+  ],
+  [
+    "ЖИ чат-ботына қандай ақпаратты енгізбеу керек?",
+    "Жалпы тақырыпты",
+    "Оқу сұрағын",
+    "Жеке құпиясөзді",
+    "Қысқа анықтаманы",
+    "C"
+  ],
+  [
+    "Жүйелік блоктағы есептеулерді орындайтын құрылғы қайсы?",
+    "Процессор",
+    "Монитор",
+    "Пернетақта",
+    "Тінтуір",
+    "A"
+  ],
+  [
+    "Компьютер бөліктерін байланыстыратын негізгі тақша қалай аталады?",
+    "Дыбыс зорайтқыш",
+    "Аналық тақша",
+    "Принтер",
+    "Веб-камера",
+    "B"
+  ],
+  [
+    "Компьютер өшкенде мазмұны жойылатын жад қайсы?",
+    "SSD",
+    "Қатты диск",
+    "Жедел жад (RAM)",
+    "Флеш-жад",
+    "C"
+  ],
+  [
+    "Файлдарды ұзақ уақыт сақтауға қай құрылғы жарайды?",
+    "Жедел жад",
+    "SSD жинақтауыш",
+    "Процессор регистрі",
+    "Кэш-жад",
+    "B"
+  ],
+  [
+    "Файл дегеніміз не?",
+    "Тек компьютердің сыртқы құрылғысы",
+    "Атауы бар сақталған деректер жиыны",
+    "Тек жұмыс үстелі",
+    "Жүйелік блоктың қақпағы",
+    "B"
+  ],
+  [
+    "Файлдарды реттеп сақтауға не көмектеседі?",
+    "Бума (қапшық)",
+    "Процессор",
+    "Монитор",
+    "Бейне карта",
+    "A"
+  ],
+  [
+    "Операциялық жүйенің негізгі қызметі қайсы?",
+    "Тек сурет салу",
+    "Құрылғылар мен бағдарламалардың жұмысын басқару",
+    "Қағаз басып шығару",
+    "Тек дыбыс жазу",
+    "B"
+  ],
+  [
+    "ЖИ ноутбук конфигурациясын ұсынса, сатып алар алдында нені тексеру маңызды?",
+    "Тек қаптаманың түсін",
+    "Қажетті бағдарламаларға сәйкестігін, сипаттамасы мен бағасын",
+    "Тек жарнамасын",
+    "Ұсынысты тексермей қабылдау",
+    "B"
+  ],
+  [
+    "Дербес компьютердің конфигурациясында RAM нені көрсетеді?",
+    "Жедел жад көлемін",
+    "Экранның түсін",
+    "Принтердің жылдамдығын",
+    "Пернетақта тілін",
+    "A"
+  ],
+  [
+    "Файлды жаңа бумаға жылжыту үшін қай әрекет қолайлы?",
+    "Экранды өшіру",
+    "Файлды қиып алып, буманың ішіне қою",
+    "Процессорды ауыстыру",
+    "Бағдарламаны жою",
+    "B"
+  ],
+  [
+    "Браузер қандай бағдарламалық қамтамасыз етуге жатады?",
+    "Аппараттық құралға",
+    "Жүйелік блокқа",
+    "Қолданбалы бағдарламаға",
+    "Қуат көзіне",
+    "C"
+  ],
+  [
+    "ЖИ әртүрлі компьютерлер ұсынса, ең орынды шешім қандай?",
+    "Ең қымбатын дәлелсіз алу",
+    "Нақты оқу міндеттері мен бюджетке сәйкестігін салыстыру",
+    "Кездейсоқ таңдау",
+    "Тек атауына қарау",
+    "B"
+  ]
+]},
+  {variant:"2",items:
+[
+  [
+    "ЖИ көмегімен дайындалған мәтінді пайдаланғанда адал әрекет қайсы?",
+    "Өз жұмысым деп көрсетіп, тексермеу",
+    "Қателерін тексеріп, ЖИ көмегін ашық көрсету",
+    "Жауапты көшіріп, деректерді ойдан қосу",
+    "Сыныптастардың атынан жариялау",
+    "B"
+  ],
+  [
+    "ЖИ құралымен жұмыс кезінде дербес деректерді қорғаудың дұрыс жолы қайсы?",
+    "Өзгенің мекенжайын жіберу",
+    "Құпиясөзді жазу",
+    "Жеке деректерді енгізбеу",
+    "Құжаттың барлық дерегін жүктеу",
+    "C"
+  ],
+  [
+    "Жүйелік блок ішіндегі бейнені өңдеуге арналған құрылғы қайсы?",
+    "Бейне карта",
+    "Сканер",
+    "Пернетақта",
+    "Монитор",
+    "A"
+  ],
+  [
+    "Процессорды қызып кетуден қорғауға не көмектеседі?",
+    "Флеш-диск",
+    "Салқындатқыш",
+    "Тінтуір",
+    "Микрофон",
+    "B"
+  ],
+  [
+    "Жедел жадтың (RAM) негізгі қызметі қандай?",
+    "Өңделіп жатқан деректерді уақытша сақтау",
+    "Қағазға басып шығару",
+    "Экранды тазалау",
+    "Файлды тұрақты сақтау",
+    "A"
+  ],
+  [
+    "Компьютер сөнгеннен кейін деректер сақталатын құрылғы қайсы?",
+    "Жедел жад",
+    "Кэш-жад",
+    "Қатты диск",
+    "Процессор регистрі",
+    "C"
+  ],
+  [
+    "Файлдың .png кеңейтімі әдетте нені білдіреді?",
+    "Сурет файлын",
+    "Дыбыс файлын",
+    "Мәтіндік құжатты",
+    "Бағдарлама кодын",
+    "A"
+  ],
+  [
+    "Бір бумадағы екі файлды ажыратуға не көмектеседі?",
+    "Файл атауы",
+    "Монитор өлшемі",
+    "Пернетақта түсі",
+    "Жүйелік блок салмағы",
+    "A"
+  ],
+  [
+    "Мәтіндік редактор қандай бағдарламалық қамтамасыз етуге жатады?",
+    "Қолданбалы бағдарламаға",
+    "Енгізу құрылғысына",
+    "Процессорға",
+    "Жедел жадқа",
+    "A"
+  ],
+  [
+    "ЖИ ұсынысын пайдаланып оқу үшін компьютер таңдағанда қандай өлшем маңызды?",
+    "Тек корпус түсі",
+    "Оқу бағдарламаларына жететін жад пен жинақтауыш, бюджет",
+    "Тек жарнамалық ұран",
+    "Тек экрандағы сурет",
+    "B"
+  ],
+  [
+    "Жүйелік блок ішіндегі қуат көзі блогы не істейді?",
+    "Электр қуатын компоненттерге жеткізеді",
+    "Мәтінді өңдейді",
+    "Қағазды басып шығарады",
+    "Дыбысты жазады",
+    "A"
+  ],
+  [
+    "Компьютердегі файлдардың орналасуын ұйымдастыруға не көмектеседі?",
+    "Файл жүйесі және бумалар",
+    "Тек тінтуір",
+    "Тек монитор",
+    "Дыбыс зорайтқыш",
+    "A"
+  ],
+  [
+    "Бағдарламаларды іске қосуға және құрылғыларды басқаруға не көмектеседі?",
+    "Мәтіндік құжат",
+    "Операциялық жүйе",
+    "Сурет файлы",
+    "USB кабель",
+    "B"
+  ],
+  [
+    "ЖИ ұсынған компьютердің сипаттамасын бағалағанда нені салыстыру керек?",
+    "Оқу тапсырмаларына қажет процессор, RAM және жинақтауышты",
+    "Тек жарнамалық суретті",
+    "Тек атауын",
+    "Тек пернетақта түсін",
+    "A"
+  ]
+]}
+];
+function builtInAssessmentGroups(){return builtInBJB.map(({variant,items})=>({label:"Аппараттық және бағдарламалық қамтамасыз ету — "+variant+"-нұсқа",questions:items.map(([question,answer_a,answer_b,answer_c,answer_d,correct_answer])=>({question,answer_a,answer_b,answer_c,answer_d,correct_answer})),local:true}))}
+function assessmentTag(grade,type,unit,variant){return AS_PREFIX+[grade,type,unit.trim(),variant.trim()].map(encodeURIComponent).join("|")}
+function assessmentParse(tag){if(!String(tag||"").startsWith(AS_PREFIX))return null;let p=tag.slice(AS_PREFIX.length).split("|");if(p.length!==4)return null;try{return p.map(decodeURIComponent)}catch{return null}}
+function assessmentInit(){for(const id of ["agrade","assessmentGrade"]){let el=document.getElementById(id);el.innerHTML=(id==="agrade"?'<option value="">Сыныпты таңдаңыз</option>':"")+Array.from({length:11},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+'-сынып</option>').join("")}assessmentList.innerHTML="";assessmentQuiz.classList.add("hidden");assessmentResult.innerHTML=""}
+let assessmentItems=[],assessmentQuestions=[],assessmentIndex=0,assessmentScore=0,assessmentName="",assessmentSubjectName="";
+async function assessmentLoad(){assessmentList.innerHTML="Жүктелуде...";assessmentQuiz.classList.add("hidden");assessmentResult.innerHTML="";assessmentItems=assessmentGrade.value==="6"&&assessmentType.value==="БЖБ"&&["Информатика","Жасанды интеллект және информатика"].includes(assessmentSubject.value)?builtInAssessmentGroups():[];let r;try{r=assessmentItems.length?{data:[]}:await db.from("questions").select("*").eq("subject",assessmentSubject.value)}catch(e){r={error:e}}let groups=new Map();for(let q of r.data||[]){let p=assessmentParse(q.topic);if(!p||p[0]!==assessmentGrade.value||p[1]!==assessmentType.value)continue;let key=q.topic;if(!groups.has(key))groups.set(key,{label:p[2]+" — "+p[3]+"-нұсқа",questions:[]});groups.get(key).questions.push(q)}assessmentItems.push(...groups.values());assessmentList.innerHTML="";if(r.error&&assessmentItems.length){let note=document.createElement("p");note.className="muted";note.textContent="Базадағы жұмыстар жүктелмеді. Дайын нұсқаларды қолдануға болады.";assessmentList.appendChild(note)}if(!assessmentItems.length){assessmentList.textContent=r.error?"Сұрақтарды жүктеу қатесі: "+(r.error.message||r.error):"Бұл таңдауға тапсырмалар әлі енгізілмеген.";return}assessmentItems.forEach((item,n)=>{let b=document.createElement("button");b.className="choice";b.textContent=item.label+" ("+item.questions.length+" сұрақ, "+item.questions.length+" балл)";b.onclick=()=>assessmentStart(n);assessmentList.appendChild(b)})}
+function assessmentStart(n){assessmentName=assessmentStudent.value.trim();if(!assessmentName){assessmentResult.innerHTML='<div class="err">Алдымен оқушының аты-жөнін енгізіңіз.</div>';return}assessmentSubjectName=assessmentSubject.value+" • "+assessmentGrade.value+"-сынып • "+assessmentType.value+" • "+assessmentItems[n].label;assessmentQuestions=assessmentItems[n].questions;assessmentIndex=assessmentScore=0;assessmentList.innerHTML="";assessmentResult.innerHTML="";assessmentQuiz.classList.remove("hidden");assessmentPaperHeader.innerHTML="";let headerLines=["Мектебі: Ә.Бөкейхан атындағы жалпы білім беретін мектебі","Сыныбы: 6 «___»                              Күні: __________","І тоқсан","БЖБ №1 – «Аппараттық және бағдарламалық қамтамасыз ету»","Оқушының аты-жөні: "+assessmentName,"Орындау уақыты: 25 минут. Максималды балл: 14","Нұсқа: "+assessmentItems[n].label.split(" — ").pop()];for(let line of headerLines){let d=document.createElement("div");d.textContent=line;assessmentPaperHeader.appendChild(d)}assessmentNext()}
+function assessmentNext(){let q=assessmentQuestions[assessmentIndex];assessmentCounter.textContent=(assessmentIndex+1)+" / "+assessmentQuestions.length;assessmentQuestion.textContent=q.question;let correct=String(q.correct_answer||"").toUpperCase().split(/[,; ]+/).filter(Boolean);let options=[["A",q.answer_a],["B",q.answer_b],["C",q.answer_c],["D",q.answer_d],["E",q.answer_e],["F",q.answer_f]].filter(z=>z[1]);assessmentAnswers.innerHTML="";for(let [key,value] of options){let b=document.createElement("button");b.className="choice";b.textContent=key+") "+value;if(correct.length===1)b.onclick=()=>assessmentPick(key===correct[0]);else{b.onclick=()=>b.classList.toggle("selected");b.dataset.key=key;assessmentAnswers.appendChild(b);continue}assessmentAnswers.appendChild(b)}if(correct.length>1){let b=document.createElement("button");b.className="primary";b.textContent="Жауап беру";b.onclick=()=>{let selected=[...assessmentAnswers.querySelectorAll(".selected")].map(x=>x.dataset.key).sort();assessmentPick(selected.length===correct.length&&selected.every((v,i)=>v===[...correct].sort()[i]))};assessmentAnswers.appendChild(b)}}
+function assessmentPick(ok){if(ok)assessmentScore++;assessmentIndex++;if(assessmentIndex<assessmentQuestions.length){assessmentNext();return}assessmentQuiz.classList.add("hidden");let total=assessmentQuestions.length,pct=Math.round(assessmentScore/total*100);assessmentResult.textContent="Нәтиже: "+assessmentScore+" / "+total+" балл ("+pct+"%). ";db.from("results").insert({student_name:assessmentName,subject:assessmentSubjectName,score:assessmentScore,total,percentage:pct}).then(({error})=>{assessmentResult.textContent+=error?"Нәтижені сақтау қатесі: "+error.message:"Нәтиже сақталды."}).catch(()=>{assessmentResult.textContent+="Нәтиже базаға сақталмады."})}
+const assessmentStyle=document.createElement("style");assessmentStyle.textContent=".choice.selected{background:#ddd6fe;outline:2px solid #7c3aed}";document.head.appendChild(assessmentStyle);
+
+// Аралас форматтағы 6-сынып БЖБ: 4 тест + 2 сәйкестендіру + 2 бос орын + 2 жазбаша = 14 балл.
+const mixedBJB=[
+{variant:'1',tasks:[
+{type:'choice',q:'ЖИ берген күмәнді ақпаратпен не істеу керек?',opts:['Тексермей көшіру','Сенімді дереккөзден тексеру','Барлығына тарату','Құпиясөзді жіберу'],answer:1,points:1},
+{type:'choice',q:'Есептеулерді орындайтын негізгі құрылғы?',opts:['Монитор','Пернетақта','Процессор','Принтер'],answer:2,points:1},
+{type:'choice',q:'Компьютер өшкенде дерегі жойылатын жад?',opts:['SSD','RAM','Қатты диск','Флеш-жад'],answer:1,points:1},
+{type:'choice',q:'Браузер қандай бағдарлама?',opts:['Қолданбалы','Аппараттық','Қуат көзі','Жүйелік блок'],answer:0,points:1},
+{type:'match',q:'Құрылғыларды қызметімен сәйкестендіріңіз.',left:['Процессор','RAM'],right:['Уақытша деректерді сақтайды','Есептеулер орындайды'],answer:[1,0],points:2},
+{type:'match',q:'Ұғымдарды сәйкестендіріңіз.',left:['Файл','Бума'],right:['Файлдарды реттеп сақтайды','Атауы бар деректер жиыны'],answer:[1,0],points:2},
+{type:'fill',q:'Компьютердің негізгі тақшасы ______ тақша деп аталады.',answer:['аналық'],points:1},
+{type:'fill',q:'Деректерді ұзақ сақтайтын жинақтауыштың бір түрі — ______.',answer:['ssd','қатты диск','hdd'],points:1},
+{type:'written',q:'ЖИ чат-ботына жеке құпиясөзді неге енгізуге болмайды? Түсіндіріңіз.',rubric:'Құпиялылық қаупін түсіндіреді — 1 балл; деректерді қорғау жолын ұсынады — 1 балл.',points:2},
+{type:'written',q:'Оқу үшін компьютер таңдағанда ескеретін екі сипаттаманы жазыңыз.',rubric:'Екі орынды сипаттаманы (мысалы, RAM, процессор, SSD, бюджет) атайды — әрқайсысы 1 балл.',points:2}
+]},
+{variant:'2',tasks:[
+{type:'choice',q:'ЖИ мәтінін қолданғанда академиялық адал әрекет қайсы?',opts:['Өз жұмысым деп көрсету','Тексеріп, ЖИ көмегін көрсету','Дерек ойдан қосу','Басқа атпен жариялау'],answer:1,points:1},
+{type:'choice',q:'Бейнені өңдеуге арналған құрылғы?',opts:['Бейне карта','Сканер','Монитор','Тінтуір'],answer:0,points:1},
+{type:'choice',q:'Компьютер сөнгеннен кейін деректер қайда сақталады?',opts:['RAM','Кэш','Қатты диск','Регистр'],answer:2,points:1},
+{type:'choice',q:'Мәтіндік редактор қандай бағдарлама?',opts:['Қолданбалы','Енгізу құрылғысы','Процессор','Жедел жад'],answer:0,points:1},
+{type:'match',q:'Құрылғыларды қызметімен сәйкестендіріңіз.',left:['Салқындатқыш','Қуат көзі'],right:['Компоненттерді электр қуатымен қамтамасыз етеді','Процессорды салқындатады'],answer:[1,0],points:2},
+{type:'match',q:'Файл жүйесі ұғымдарын сәйкестендіріңіз.',left:['.png','Бума'],right:['Файлдарды топтайды','Сурет файлының кеңейтімі'],answer:[1,0],points:2},
+{type:'fill',q:'Өңделіп жатқан деректерді уақытша сақтайтын жад — ______.',answer:['ram','жедел жад'],points:1},
+{type:'fill',q:'Құрылғылар мен бағдарламаларды басқаратын жүйе — ______ жүйе.',answer:['операциялық'],points:1},
+{type:'written',q:'ЖИ көмегімен алынған жауапты не үшін тексеру керек? Екі себеп жазыңыз.',rubric:'Екі негізді себеп жазады — әрқайсысы 1 балл.',points:2},
+{type:'written',q:'Оқу үшін компьютер таңдағанда RAM мен жинақтауыштың маңызын түсіндіріңіз.',rubric:'RAM маңызын түсіндіреді — 1 балл; жинақтауыш маңызын түсіндіреді — 1 балл.',points:2}
+]}];
+function mixedGroups(){return mixedBJB.map(x=>({label:'Аппараттық және бағдарламалық қамтамасыз ету — '+x.variant+'-нұсқа',questions:x.tasks,local:true,mixed:true}))}
+const oldAssessmentLoad=assessmentLoad;
+assessmentLoad=async function(){await oldAssessmentLoad();if(assessmentGrade.value==='6'&&assessmentType.value==='БЖБ'&&['Информатика','Жасанды интеллект және информатика'].includes(assessmentSubject.value)){
+assessmentItems=assessmentItems.filter(x=>!x.local);assessmentItems.unshift(...mixedGroups());assessmentList.innerHTML='';assessmentItems.forEach((item,n)=>{let b=document.createElement('button');b.className='choice';let total=item.questions.reduce((sum,q)=>sum+(q.points||1),0);b.textContent=item.label+' ('+item.questions.length+' тапсырма, '+total+' балл)';b.onclick=()=>assessmentStart(n);assessmentList.appendChild(b)})}}
+let mixedResponses=[];
+const oldAssessmentStart=assessmentStart;
+assessmentStart=function(n){if(!assessmentItems[n].mixed){oldAssessmentStart(n);return}assessmentName=assessmentStudent.value.trim();if(!assessmentName){assessmentResult.innerHTML='<div class="err">Оқушының аты-жөнін енгізіңіз.</div>';return}assessmentSubjectName=assessmentSubject.value+' • 6-сынып • БЖБ • '+assessmentItems[n].label;assessmentQuestions=assessmentItems[n].questions;assessmentIndex=0;assessmentScore=0;mixedResponses=[];assessmentList.innerHTML='';assessmentResult.innerHTML='';assessmentQuiz.classList.remove('hidden');assessmentPaperHeader.innerHTML='';['Мектебі: Ә.Бөкейхан атындағы жалпы білім беретін мектебі','Сыныбы: 6 «___»     Күні: __________','І тоқсан','БЖБ №1 – «Аппараттық және бағдарламалық қамтамасыз ету»','Оқушының аты-жөні: '+assessmentName,'Орындау уақыты: 25 минут. Максималды балл: 14','Нұсқа: '+assessmentItems[n].label.split(' — ').pop()].forEach(line=>{let d=document.createElement('div');d.textContent=line;assessmentPaperHeader.appendChild(d)});mixedNext()};
+function mixedNext(){let q=assessmentQuestions[assessmentIndex];assessmentCounter.textContent=(assessmentIndex+1)+' / '+assessmentQuestions.length+' тапсырма • '+q.points+' балл';assessmentQuestion.textContent=q.q;assessmentAnswers.innerHTML='';let root=assessmentAnswers;
+if(q.type==='choice'){q.opts.forEach((opt,i)=>{let b=document.createElement('button');b.className='choice';b.textContent='ABCD'[i]+') '+opt;b.onclick=()=>mixedSave(i);root.appendChild(b)})}
+if(q.type==='match'){q.left.forEach((left,i)=>{let label=document.createElement('label');label.textContent=left;let sel=document.createElement('select');sel.className='mixedMatch';sel.dataset.index=i;sel.innerHTML='<option value="">Сәйкесін таңдаңыз</option>';q.right.forEach((r,j)=>{let o=document.createElement('option');o.value=j;o.textContent=r;sel.appendChild(o)});root.append(label,sel)});mixedNextButton(()=>mixedSave([...root.querySelectorAll('.mixedMatch')].map(x=>x.value===''?-1:Number(x.value))))}
+if(q.type==='fill'||q.type==='written'){let field=document.createElement(q.type==='fill'?'input':'textarea');field.id='mixedText';field.placeholder=q.type==='fill'?'Жауабыңызды жазыңыз':'Толық жауабыңызды жазыңыз';root.appendChild(field);mixedNextButton(()=>mixedSave(field.value.trim()))}}
+function mixedNextButton(action){let b=document.createElement('button');b.className='primary';b.textContent='Жауапты сақтау және жалғастыру';b.onclick=action;assessmentAnswers.appendChild(b)}
+function mixedSave(value){mixedResponses.push(value);assessmentIndex++;if(assessmentIndex<assessmentQuestions.length)mixedNext();else mixedFinish()}
+function mixedFinish(){assessmentQuiz.classList.add('hidden');let automatic=0;let written=[];assessmentQuestions.forEach((q,i)=>{let a=mixedResponses[i];if(q.type==='choice'&&a===q.answer)automatic+=q.points;if(q.type==='match')automatic+=q.answer.reduce((n,v,j)=>n+(a[j]===v?1:0),0);if(q.type==='fill'&&q.answer.some(v=>v.toLocaleLowerCase('kk').trim()===String(a).toLocaleLowerCase('kk').trim()))automatic+=q.points;if(q.type==='written')written.push({q,a})});let result=assessmentResult;result.innerHTML='';let h=document.createElement('h3');h.textContent='Автоматты тексерілген балл: '+automatic+' / 10';result.appendChild(h);let note=document.createElement('p');note.textContent='Жазбаша жауаптар: 4 балл. Мұғалім тексергеннен кейін қорытынды 14 баллдың ішінен қойылады.';result.appendChild(note);written.forEach((x,i)=>{let box=document.createElement('div');box.className='card';box.style.padding='14px';let title=document.createElement('b');title.textContent=x.q.q;let answer=document.createElement('p');answer.textContent='Оқушы жауабы: '+(x.a||'(жауап жоқ)');let rubric=document.createElement('p');rubric.className='muted';rubric.textContent='Дескриптор: '+x.q.rubric;let sel=document.createElement('select');sel.className='writtenScore';[0,1,2].forEach(n=>{let o=document.createElement('option');o.value=n;o.textContent=n+' балл';sel.appendChild(o)});box.append(title,answer,rubric,sel);result.appendChild(box)});let btn=document.createElement('button');btn.className='primary';btn.textContent='Мұғалім бағасын есептеу';let final=document.createElement('h3');btn.onclick=()=>{let score=automatic+[...result.querySelectorAll('.writtenScore')].reduce((n,sel)=>n+Number(sel.value),0);final.textContent='Қорытынды нәтиже: '+score+' / 14 балл ('+Math.round(score/14*100)+'%)';};result.append(btn,final);let warning=document.createElement('p');warning.className='muted';warning.textContent='Ескерту: жазбаша жауаптар мен мұғалім бағасы әзірше тек осы бетте көрсетіледі, Supabase-қа сақталмайды.';result.appendChild(warning)}
+
+document.addEventListener("DOMContentLoaded",assessmentInit);
+
+const practiceBank={"Қазақстан тарихы": [{"question": "Қазақ хандығының негізін қалаған хандар кімдер?", "answer_a": "Керей мен Жәнібек", "answer_b": "Абылай мен Кенесары", "answer_c": "Тәуке мен Есім", "answer_d": "Қасым мен Хақназар", "correct_answer": "A"}, {"question": "«Жеті жарғы» заңдар жинағы қай ханның тұсында жасалды?", "answer_a": "Жәңгір хан", "answer_b": "Тәуке хан", "answer_c": "Абылай хан", "answer_d": "Кенесары хан", "correct_answer": "B"}, {"question": "Абылай хан қай ғасырда өмір сүрді?", "answer_a": "XVI ғасырда", "answer_b": "XX ғасырда", "answer_c": "XVIII ғасырда", "answer_d": "XIV ғасырда", "correct_answer": "C"}, {"question": "1837–1847 жылдардағы көтерілісті кім басқарды?", "answer_a": "Сырым Датұлы", "answer_b": "Амангелді Иманов", "answer_c": "Исатай Тайманұлы", "answer_d": "Кенесары Қасымұлы", "correct_answer": "D"}, {"question": "Алтын адам табылған Есік қорғаны қай облыста орналасқан?", "answer_a": "Алматы облысында", "answer_b": "Ақмола облысында", "answer_c": "Атырау облысында", "answer_d": "Павлодар облысында", "correct_answer": "A"}, {"question": "Шоқан Уәлихановтың негізгі қызметі қандай болды?", "answer_a": "Композитор", "answer_b": "Ғалым және зерттеуші", "answer_c": "Хан", "answer_d": "Өнеркәсіп иесі", "correct_answer": "B"}, {"question": "Абай Құнанбайұлы қай жылы дүниеге келді?", "answer_a": "1855 жылы", "answer_b": "1865 жылы", "answer_c": "1845 жылы", "answer_d": "1835 жылы", "correct_answer": "C"}, {"question": "Алаш автономиясы қай жылы жарияланды?", "answer_a": "1905 жылы", "answer_b": "1925 жылы", "answer_c": "1936 жылы", "answer_d": "1917 жылы", "correct_answer": "D"}, {"question": "Қазақстан тәуелсіздігі қай күні жарияланды?", "answer_a": "1991 жылғы 16 желтоқсанда", "answer_b": "1990 жылғы 25 қазанда", "answer_c": "1991 жылғы 30 тамызда", "answer_d": "1992 жылғы 4 маусымда", "correct_answer": "A"}, {"question": "Қазақстанның БҰҰ-ға қабылданған жылы?", "answer_a": "1995 жыл", "answer_b": "1992 жыл", "answer_c": "1991 жыл", "answer_d": "1993 жыл", "correct_answer": "B"}], "Оқу сауаттылығы": [{"question": "Мәтін: «Айша күн сайын он бет кітап оқиды. Бір аптадан кейін ол жетпіс бет оқып бітірді». Айша күніне неше бет оқиды?", "answer_a": "10 бет", "answer_b": "7 бет", "answer_c": "70 бет", "answer_d": "5 бет", "correct_answer": "A"}, {"question": "Мәтін: «Кітапхана дүйсенбіде жабық. Қалған күндері сағат 9:00-де ашылады». Сейсенбіде кітапхана нешеде ашылады?", "answer_a": "Ашылмайды", "answer_b": "9:00-де", "answer_c": "8:00-де", "answer_d": "10:00-де", "correct_answer": "B"}, {"question": "Мәтін: «Таңертең аспанды бұлт торлады. Түсте жаңбыр жауды». Оқиғалардың реті қандай?", "answer_a": "Екі оқиға түнде болды", "answer_b": "Алдымен күн ашылды", "answer_c": "Алдымен бұлт торлады, кейін жаңбыр жауды", "answer_d": "Алдымен жаңбыр жауды", "correct_answer": "C"}, {"question": "Мәтін: «Мектепте қағаз жинау акциясы өтті. Оқушылар ескі дәптерлерін қайта өңдеуге тапсырды». Мәтіннің негізгі ойы?", "answer_a": "Жаңа дәптер сатып алу", "answer_b": "Спорт жарысын өткізу", "answer_c": "Мектепті жөндеу", "answer_d": "Қағазды қайта өңдеуге жинау", "correct_answer": "D"}, {"question": "Мәтін: «Данияр досына есептің шешу жолын түсіндірді, бірақ жауабын көшіртпеді». Даниярдың мақсаты?", "answer_a": "Досының есепті түсінуіне көмектесу", "answer_b": "Досының орнына жазу", "answer_c": "Есепті жасыру", "answer_d": "Сабақты тоқтату", "correct_answer": "A"}, {"question": "Мәтін: «Автобус сағат 8:10-да келді. Марат аялдамаға 8:15-те жетті». Мәтіннен қандай қорытынды шығады?", "answer_a": "Марат автобус жүргізді", "answer_b": "Марат бұл автобусқа үлгермеді", "answer_c": "Марат бес минут ерте келді", "answer_d": "Автобус кешікті", "correct_answer": "B"}, {"question": "Мәтін: «Зерттеуде бірдей екі өсімдіктің бірін жарыққа, екіншісін қараңғыға қойды». Қандай фактор салыстырылады?", "answer_a": "Құмыра салмағы", "answer_b": "Судың температурасы", "answer_c": "Жарықтың әсері", "answer_d": "Топырақ түсі", "correct_answer": "C"}, {"question": "Мәтін: «Хабарландыру: сенбі, 11:00, акт залы — робот техникасы көрмесі». Бұл мәтіннің мақсаты?", "answer_a": "Ертегі айту", "answer_b": "Тәжірибені сипаттау", "answer_c": "Өмірбаян жазу", "answer_d": "Көрме туралы хабарлау", "correct_answer": "D"}, {"question": "Мәтін: «Жарысқа 20 оқушы тіркелді, оның 18-і қатысты». Қанша оқушы қатыспады?", "answer_a": "2 оқушы", "answer_b": "18 оқушы", "answer_c": "20 оқушы", "answer_d": "38 оқушы", "correct_answer": "A"}, {"question": "Мәтін: «Суды үнемдеу үшін ақаулы кранды жөндеп, ыдыс жуғанда суды бос ағызбау керек». Ең лайық тақырып?", "answer_a": "Су көлігі", "answer_b": "Суды үнемдеу", "answer_c": "Өзендегі балықтар", "answer_d": "Жаңбыр түрлері", "correct_answer": "B"}], "Математикалық сауаттылық": [{"question": "8000 теңгелік тауарға 25% жеңілдік жасалды. Жаңа бағасы?", "answer_a": "6000 теңге", "answer_b": "2000 теңге", "answer_c": "7500 теңге", "answer_d": "10000 теңге", "correct_answer": "A"}, {"question": "Автокөлік 60 км/сағ жылдамдықпен 2,5 сағат жүрді. Жүрген жолы?", "answer_a": "180 км", "answer_b": "150 км", "answer_c": "120 км", "answer_d": "24 км", "correct_answer": "B"}, {"question": "3, 5, 7 және 9 сандарының арифметикалық ортасы?", "answer_a": "7", "answer_b": "8", "answer_c": "6", "answer_d": "5", "correct_answer": "C"}, {"question": "Қорапта 3 қызыл және 2 көк шар бар. Кездейсоқ алынған шардың көк болу ықтималдығы?", "answer_a": "3/5", "answer_b": "1/5", "answer_c": "2/3", "answer_d": "2/5", "correct_answer": "D"}, {"question": "Ұзындығы 8 м, ені 5 м тік төртбұрыштың периметрі?", "answer_a": "26 м", "answer_b": "40 м", "answer_c": "13 м", "answer_d": "16 м", "correct_answer": "A"}, {"question": "2:3 қатынасында бөлінген 25 алманың кіші бөлігі неше алма?", "answer_a": "12", "answer_b": "10", "answer_c": "15", "answer_d": "5", "correct_answer": "B"}, {"question": "Баға 1000 теңгеден 1200 теңгеге өсті. Өсу пайызы?", "answer_a": "25%", "answer_b": "10%", "answer_c": "20%", "answer_d": "12%", "correct_answer": "C"}, {"question": "Сағат 14:35-тен 16:10-ға дейін қанша уақыт өтті?", "answer_a": "1 сағат 25 минут", "answer_b": "2 сағат 35 минут", "answer_c": "95 сағат", "answer_d": "1 сағат 35 минут", "correct_answer": "D"}, {"question": "2, 4, 8, 16, ... тізбегінің келесі мүшесі?", "answer_a": "32", "answer_b": "24", "answer_c": "18", "answer_d": "30", "correct_answer": "A"}, {"question": "Бес дәптер 750 теңге тұрады. Осындай 8 дәптер қанша тұрады?", "answer_a": "900 теңге", "answer_b": "1200 теңге", "answer_c": "1000 теңге", "answer_d": "1500 теңге", "correct_answer": "B"}], "Математика": [{"question": "2x + 7 = 19 теңдеуінің түбірі?", "answer_a": "6", "answer_b": "5", "answer_c": "12", "answer_d": "13", "correct_answer": "A"}, {"question": "x² − 5x + 6 = 0 теңдеуінің түбірлері?", "answer_a": "−1 және −6", "answer_b": "2 және 3", "answer_c": "1 және 6", "answer_d": "−2 және −3", "correct_answer": "B"}, {"question": "f(x) = 3x² болса, f′(x) неге тең?", "answer_a": "6x²", "answer_b": "x³", "answer_c": "6x", "answer_d": "3x", "correct_answer": "C"}, {"question": "log₂32 мәні?", "answer_a": "4", "answer_b": "6", "answer_c": "16", "answer_d": "5", "correct_answer": "D"}, {"question": "sin 30° мәні?", "answer_a": "1/2", "answer_b": "√3/2", "answer_c": "1", "answer_d": "0", "correct_answer": "A"}, {"question": "Алғашқы мүшесі 3, айырмасы 4 болатын арифметикалық прогрессияның бесінші мүшесі?", "answer_a": "20", "answer_b": "19", "answer_c": "15", "answer_d": "23", "correct_answer": "B"}, {"question": "Катеттері 6 және 8 болатын тікбұрышты үшбұрыштың гипотенузасы?", "answer_a": "12", "answer_b": "7", "answer_c": "10", "answer_d": "14", "correct_answer": "C"}, {"question": "y = √(x − 2) функциясының анықталу облысы?", "answer_a": "x > 2", "answer_b": "x ≤ 2", "answer_c": "Барлық нақты сандар", "answer_d": "x ≥ 2", "correct_answer": "D"}, {"question": "2³ · 2⁴ мәні?", "answer_a": "128", "answer_b": "64", "answer_c": "32", "answer_d": "256", "correct_answer": "A"}, {"question": "x² функциясының алғашқы функцияларының бірі?", "answer_a": "x²/2", "answer_b": "x³/3", "answer_c": "2x", "answer_d": "x³", "correct_answer": "B"}], "Физика": [{"question": "Массасы 2 кг денеге 3 м/с² үдеу беру үшін қандай күш керек?", "answer_a": "6 Н", "answer_b": "1,5 Н", "answer_c": "5 Н", "answer_d": "9 Н", "correct_answer": "A"}, {"question": "Кедергісі 4 Ом өткізгішке 12 В кернеу берілді. Ток күші?", "answer_a": "0,33 А", "answer_b": "3 А", "answer_c": "48 А", "answer_d": "8 А", "correct_answer": "B"}, {"question": "Дене 100 м жолды 20 секундта бірқалыпты өтті. Жылдамдығы?", "answer_a": "20 м/с", "answer_b": "120 м/с", "answer_c": "5 м/с", "answer_d": "2 м/с", "correct_answer": "C"}, {"question": "Массасы 2 кг дене 4 м/с жылдамдықпен қозғалады. Кинетикалық энергиясы?", "answer_a": "8 Дж", "answer_b": "32 Дж", "answer_c": "4 Дж", "answer_d": "16 Дж", "correct_answer": "D"}, {"question": "Күштің SI жүйесіндегі өлшем бірлігі?", "answer_a": "Ньютон", "answer_b": "Джоуль", "answer_c": "Ватт", "answer_d": "Паскаль", "correct_answer": "A"}, {"question": "Толқын жиілігі 5 Гц, ұзындығы 2 м. Таралу жылдамдығы?", "answer_a": "0,4 м/с", "answer_b": "10 м/с", "answer_c": "2,5 м/с", "answer_d": "7 м/с", "correct_answer": "B"}, {"question": "100 Н күш 2 м² ауданға перпендикуляр әсер етеді. Қысым?", "answer_a": "102 Па", "answer_b": "98 Па", "answer_c": "50 Па", "answer_d": "200 Па", "correct_answer": "C"}, {"question": "Құрылғы 10 секундта 600 Дж жұмыс атқарды. Қуаты?", "answer_a": "6000 Вт", "answer_b": "610 Вт", "answer_c": "6 Вт", "answer_d": "60 Вт", "correct_answer": "D"}, {"question": "Біртекті ортада жарық қалай таралады?", "answer_a": "Түзу сызық бойымен", "answer_b": "Әрдайым шеңбер бойымен", "answer_c": "Тек ирек сызықпен", "answer_d": "Қозғалмайды", "correct_answer": "A"}, {"question": "Массасы 3 кг дененің салмақ күші қандай? g = 10 м/с², дене тыныштықта.", "answer_a": "13 Н", "answer_b": "30 Н", "answer_c": "3 Н", "answer_d": "0,3 Н", "correct_answer": "B"}], "Информатика": [{"question": "Екілік санау жүйесіндегі 1010 саны ондық жүйеде неге тең?", "answer_a": "10", "answer_b": "12", "answer_c": "8", "answer_d": "11", "correct_answer": "A"}, {"question": "1 байтта неше бит бар?", "answer_a": "1024", "answer_b": "8", "answer_c": "2", "answer_d": "16", "correct_answer": "B"}, {"question": "Python тіліндегі print(3 ** 2) нәтижесі?", "answer_a": "5", "answer_b": "8", "answer_c": "9", "answer_d": "6", "correct_answer": "C"}, {"question": "AND логикалық амалы қашан ақиқат болады?", "answer_a": "Кемінде бір пікір ақиқат болғанда", "answer_b": "Екі пікір де жалған болғанда", "answer_c": "Пікірлер әртүрлі болғанда", "answer_d": "Екі пікір де ақиқат болғанда", "correct_answer": "D"}, {"question": "Python тіліндегі len('ALMA') нәтижесі?", "answer_a": "4", "answer_b": "3", "answer_c": "5", "answer_d": "0", "correct_answer": "A"}, {"question": "Кестеден мәліметтерді таңдау үшін SQL тілінде қай команда қолданылады?", "answer_a": "UPDATE", "answer_b": "SELECT", "answer_c": "DELETE", "answer_d": "DROP", "correct_answer": "B"}, {"question": "IP мекенжайының негізгі қызметі?", "answer_a": "Мәтінді бояу", "answer_b": "Экран жарығын реттеу", "answer_c": "Желідегі құрылғыны адрестеу", "answer_d": "Файлды сығу", "correct_answer": "C"}, {"question": "Фишинг деген не?", "answer_a": "Файлды архивтеу", "answer_b": "Бағдарламаны жаңарту", "answer_c": "Құпиясөзді заңды түрде ауыстыру", "answer_d": "Алдау арқылы құпия деректерді иемденуге әрекет жасау", "correct_answer": "D"}, {"question": "Электрондық кестеде A1:A3 ұяшықтарының қосындысын есептейтін формула?", "answer_a": "=SUM(A1:A3)", "answer_b": "=MAX(A1:A3)", "answer_c": "=MIN(A1:A3)", "answer_d": "=COUNT(A1:A3)", "correct_answer": "A"}, {"question": "Сұрыпталған массивте екілік іздеудің уақыт күрделілігі?", "answer_a": "O(2ⁿ)", "answer_b": "O(log n)", "answer_c": "O(n²)", "answer_d": "O(n)", "correct_answer": "B"}], "Биология": [{"question": "Жасушада нәруыз синтезі қай органоидта жүреді?", "answer_a": "Рибосомада", "answer_b": "Лизосомада", "answer_c": "Вакуольде", "answer_d": "Жасуша қабырғасында", "correct_answer": "A"}, {"question": "Фотосинтез кезінде өсімдіктер қандай газ бөледі?", "answer_a": "Сутек", "answer_b": "Оттек", "answer_c": "Азот", "answer_d": "Көмірқышқыл газы", "correct_answer": "B"}, {"question": "ДНҚ құрамындағы аденинге комплементарлы негіз?", "answer_a": "Гуанин", "answer_b": "Цитозин", "answer_c": "Тимин", "answer_d": "Урацил", "correct_answer": "C"}, {"question": "Адамның дене жасушасында қалыпты жағдайда неше хромосома болады?", "answer_a": "23", "answer_b": "48", "answer_c": "44", "answer_d": "46", "correct_answer": "D"}, {"question": "Өкпедегі газ алмасу негізінен қайда жүреді?", "answer_a": "Альвеолаларда", "answer_b": "Кеңірдекте", "answer_c": "Көмейде", "answer_d": "Жұтқыншақта", "correct_answer": "A"}, {"question": "Қанның оттекті тасымалдауға маманданған жасушалары?", "answer_a": "Нейрондар", "answer_b": "Эритроциттер", "answer_c": "Лейкоциттер", "answer_d": "Тромбоциттер", "correct_answer": "B"}, {"question": "Бүйректің құрылымдық және қызметтік бірлігі?", "answer_a": "Альвеола", "answer_b": "Нефридий", "answer_c": "Нефрон", "answer_d": "Нейрон", "correct_answer": "C"}, {"question": "Ферменттердің негізгі қызметі?", "answer_a": "Тұқымқуалаушылық ақпаратты сақтау", "answer_b": "Оттекті тасымалдау", "answer_c": "Жарықты шағылыстыру", "answer_d": "Химиялық реакцияларды жылдамдату", "correct_answer": "D"}, {"question": "Aa × Aa будандастыруында aa генотипінің ықтималдығы?", "answer_a": "25%", "answer_b": "50%", "answer_c": "75%", "answer_d": "100%", "correct_answer": "A"}, {"question": "Митоз нәтижесінде бір жасушадан әдетте неше жасуша түзіледі?", "answer_a": "1", "answer_b": "2", "answer_c": "4", "answer_d": "8", "correct_answer": "B"}], "Химия": [{"question": "Судың химиялық формуласы?", "answer_a": "H₂O", "answer_b": "CO₂", "answer_c": "O₂", "answer_d": "NaCl", "correct_answer": "A"}, {"question": "Натрийдің химиялық таңбасы?", "answer_a": "Ni", "answer_b": "Na", "answer_c": "N", "answer_d": "Ne", "correct_answer": "B"}, {"question": "Салыстырмалы атомдық массалар H = 1, O = 16. Судың молярлық массасы?", "answer_a": "16 г/моль", "answer_b": "20 г/моль", "answer_c": "18 г/моль", "answer_d": "17 г/моль", "correct_answer": "C"}, {"question": "Атом ядросындағы протон саны нені анықтайды?", "answer_a": "Нейтрон санын", "answer_b": "Массалық санды ғана", "answer_c": "Электрондық қабат санын ғана", "answer_d": "Элементтің реттік нөмірін", "correct_answer": "D"}, {"question": "pH = 2 болатын су ерітіндісінің ортасы қандай?", "answer_a": "Қышқыл", "answer_b": "Сілтілі", "answer_c": "Бейтарап", "answer_d": "Әрдайым тұзды", "correct_answer": "A"}, {"question": "2H₂ + O₂ → 2H₂O теңдеуінде сутектің алдындағы коэффициент?", "answer_a": "4", "answer_b": "2", "answer_c": "1", "answer_d": "3", "correct_answer": "B"}, {"question": "NaCl қосылысындағы негізгі химиялық байланыс түрі?", "answer_a": "Полюссіз ковалентті", "answer_b": "Сутектік", "answer_c": "Иондық", "answer_d": "Металдық", "correct_answer": "C"}, {"question": "1 моль затта шамамен қанша бөлшек бар?", "answer_a": "6,02 × 10²", "answer_b": "3,01 × 10²³", "answer_c": "1,00 × 10²³", "answer_d": "6,02 × 10²³", "correct_answer": "D"}, {"question": "Қай зат жай затқа жатады?", "answer_a": "O₂", "answer_b": "H₂O", "answer_c": "CO₂", "answer_d": "NaOH", "correct_answer": "A"}, {"question": "Метанның формуласы?", "answer_a": "C₃H₈", "answer_b": "CH₄", "answer_c": "C₂H₆", "answer_d": "C₂H₄", "correct_answer": "B"}], "География": [{"question": "Жердің ең үлкен мұхиты?", "answer_a": "Тынық мұхиты", "answer_b": "Атлант мұхиты", "answer_c": "Үнді мұхиты", "answer_d": "Солтүстік Мұзды мұхит", "correct_answer": "A"}, {"question": "Экватордың географиялық ендігі?", "answer_a": "180°", "answer_b": "0°", "answer_c": "90° с.е.", "answer_d": "90° о.е.", "correct_answer": "B"}, {"question": "Карта масштабы 1:100000. Картадағы 1 см жер бетінде қаншаға тең?", "answer_a": "10 м", "answer_b": "10 км", "answer_c": "1 км", "answer_d": "100 км", "correct_answer": "C"}, {"question": "Ауа райы құбылыстарының басым бөлігі қай қабатта өтеді?", "answer_a": "Стратосферада", "answer_b": "Мезосферада", "answer_c": "Термосферада", "answer_d": "Тропосферада", "correct_answer": "D"}, {"question": "Қазақстан қай материкте орналасқан?", "answer_a": "Еуразия", "answer_b": "Африка", "answer_c": "Аустралия", "answer_d": "Оңтүстік Америка", "correct_answer": "A"}, {"question": "Жердің өз осінен айналуының негізгі салдары?", "answer_a": "Мұхиттардың пайда болуы", "answer_b": "Күн мен түннің алмасуы", "answer_c": "Жыл мезгілдерінің алмасуы", "answer_d": "Материктердің жылжуы", "correct_answer": "B"}, {"question": "Дүниежүзіндегі ең биік тау шыңы?", "answer_a": "Эльбрус", "answer_b": "Монблан", "answer_c": "Джомолунгма (Эверест)", "answer_d": "Килиманджаро", "correct_answer": "C"}, {"question": "Өзеннің теңізге не көлге құятын жері қалай аталады?", "answer_a": "Бастау", "answer_b": "Суайрық", "answer_c": "Арна", "answer_d": "Саға", "correct_answer": "D"}, {"question": "Атмосфералық қысымды өлшейтін құрал?", "answer_a": "Барометр", "answer_b": "Термометр", "answer_c": "Гигрометр", "answer_d": "Анемометр", "correct_answer": "A"}, {"question": "Қай ресурс жаңартылатын энергия көзіне жатады?", "answer_a": "Табиғи газ", "answer_b": "Күн энергиясы", "answer_c": "Көмір", "answer_d": "Мұнай", "correct_answer": "B"}], "Қазақ тілі": [{"question": "Заттың атын білдіретін сөз табы?", "answer_a": "Зат есім", "answer_b": "Сын есім", "answer_c": "Етістік", "answer_d": "Үстеу", "correct_answer": "A"}, {"question": "«Әдемі» сөзі қай сөз табына жатады?", "answer_a": "Етістік", "answer_b": "Сын есім", "answer_c": "Зат есім", "answer_d": "Сан есім", "correct_answer": "B"}, {"question": "«Кітаптар» сөзіндегі көптік жалғауы?", "answer_a": "−тап", "answer_b": "−ар", "answer_c": "−тар", "answer_d": "−кі", "correct_answer": "C"}, {"question": "«Оқушы кітап оқыды» сөйлеміндегі бастауыш?", "answer_a": "Кітап", "answer_b": "Оқыды", "answer_c": "Кітап оқыды", "answer_d": "Оқушы", "correct_answer": "D"}, {"question": "«Жылдам» сөзіне мағыналас сөз?", "answer_a": "Тез", "answer_b": "Баяу", "answer_c": "Алыс", "answer_d": "Биік", "correct_answer": "A"}, {"question": "«Биік» сөзінің антонимі?", "answer_a": "Зор", "answer_b": "Аласа", "answer_c": "Жоғары", "answer_d": "Ұзын", "correct_answer": "B"}, {"question": "«Мен мектепке бардым» сөйлеміндегі «мектепке» сөзі қай септікте?", "answer_a": "Ілік септік", "answer_b": "Жатыс септік", "answer_c": "Барыс септік", "answer_d": "Атау септік", "correct_answer": "C"}, {"question": "Қай қатарда тек дауысты дыбыстар берілген?", "answer_a": "б, в, г, ғ", "answer_b": "м, н, ң, р", "answer_c": "с, з, ш, ж", "answer_d": "а, ә, о, ө", "correct_answer": "D"}, {"question": "«Бес» сөзі қай сөз табына жатады?", "answer_a": "Сан есім", "answer_b": "Есімдік", "answer_c": "Етістік", "answer_d": "Шылау", "correct_answer": "A"}, {"question": "Хабарлы сөйлемнің соңына қандай тыныс белгісі қойылады?", "answer_a": "Үтір", "answer_b": "Нүкте", "answer_c": "Сұрау белгісі", "answer_d": "Қос нүкте", "correct_answer": "B"}]};
+const onlineSubjects=subjects,onlineStartUT=startUT;
+subjects=async function(){if(document.getElementById('testSource').value==='online'){await onlineSubjects();return}ts.innerHTML='';for(const name of Object.keys(practiceBank)){let o=document.createElement('option');o.value=name;o.textContent=name+' · 10 сұрақ';ts.appendChild(o)}sm.textContent='10 пән • 100 сұрақ. Дайын тесттер интернет базасына қосылмай жұмыс істейді.'};
+let practiceAttempt=false,practiceResponses=[];
+startUT=async function(){if(!studentName.value.trim()){sm.textContent='Оқушының аты-жөнін енгізіңіз.';return}practiceAttempt=document.getElementById('testSource').value!=='online';practiceResponses=[];res.innerHTML='';res.classList.add('hidden');if(!practiceAttempt){await onlineStartUT();return}window.currentStudent=studentName.value.trim();window.currentSubject=ts.value;test=sh(practiceBank[ts.value]||[]);if(!test.length){sm.textContent='Пәнді таңдаңыз.';return}i=0;score=0;setup.classList.add('hidden');quiz.classList.remove('hidden');showUT()};
+const onlineShowUT=showUT,onlinePick=pick;
+showUT=function(){if(!practiceAttempt){onlineShowUT();return}let q=test[i];cnt.textContent=(i+1)+' / 10 • '+window.currentSubject;qq.textContent=q.question;ans.innerHTML='';let options='ABCD'.split('').map((key,n)=>({key,text:q['answer_'+key.toLowerCase()]}));options.forEach(({key,text})=>{let b=document.createElement('button');b.className='choice';b.textContent=key+') '+text;b.onclick=()=>{if(b.disabled)return;ans.querySelectorAll('button').forEach(x=>x.disabled=true);practiceResponses.push({question:q.question,chosen:text,correct:q['answer_'+q.correct_answer.toLowerCase()],ok:key===q.correct_answer});pick(key===q.correct_answer)};ans.appendChild(b)})};
+pick=function(ok){if(!practiceAttempt){onlinePick(ok);return}if(ok)score++;i++;if(i<test.length){showUT();return}quiz.classList.add('hidden');res.classList.remove('hidden');res.innerHTML='';let title=document.createElement('h2');title.textContent='Нәтиже: '+score+' / 10 ('+(score*10)+'%)';let info=document.createElement('p');info.textContent=window.currentStudent+' • '+window.currentSubject;res.append(title,info);let review=document.createElement('h3');review.textContent='Жауаптарды талдау';res.appendChild(review);practiceResponses.forEach((a,n)=>{let box=document.createElement('div');box.className='card';box.style.padding='16px';let h=document.createElement('b');h.textContent=(n+1)+'. '+a.question;let p=document.createElement('p');p.textContent=(a.ok?'✓ Дұрыс: ':'✗ Сіздің жауабыңыз: ')+a.chosen;box.append(h,p);if(!a.ok){let correct=document.createElement('p');correct.textContent='Дұрыс жауап: '+a.correct;box.appendChild(correct)}res.appendChild(box)});let retry=document.createElement('button');retry.className='primary';retry.textContent='Басқа тестті таңдау';retry.onclick=()=>{res.classList.add('hidden');setup.classList.remove('hidden');subjects()};let note=document.createElement('p');note.className='muted';note.textContent='Дайын жаттығу тестінің нәтижесі осы бетте көрсетіледі.';res.append(retry,note)};
+if(location.hash==='#student')show('student');
+
+</script></body></html>

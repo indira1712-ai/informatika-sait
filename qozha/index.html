@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="bauhaus">
+  <title>Менің атым — Қожа | Интерактивті комикс</title>
+
+  <!-- Google Fonts: Space Grotesk & Inter -->
+
+  <!-- Lucide Icons -->
+
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces */
+      --background: #f5f0e8;               /* warm off-white, vintage comic paper */
+      --surface-container-low: #ffffff;    /* pure white panel cards */
+      --surface-container: #eee9e0;        /* filled panels, controls */
+      --surface-container-high: #e2dbcf;   /* header band, pressed elements */
+
+      /* Ink */
+      --on-surface: #1a1a1a;               /* deep ink black */
+      --on-surface-variant: #4a4a4a;       /* secondary text, captions */
+
+      /* Lines & Borders */
+      --outline: #1a1a1a;                  /* comic border lines & hard shadows */
+      --outline-variant: #d0cbc3;          /* light dividers */
+
+      /* Accents (Bauhaus Graphic Palette) */
+      --primary: #1a1a1a;                  /* ink black */
+      --on-primary: #ffffff;
+      --primary-container: #ffcc00;        /* comic yellow highlight & SFX */
+      --on-primary-container: #1a1a1a;
+      --secondary: #e63b2e;                /* signal red action & anger */
+      --tertiary: #0055ff;                 /* signal blue interactive */
+      --error: #cc0000;
+      --on-error: #ffffff;
+
+      /* Comic & Data series */
+      --data-1: #e63b2e;
+      --data-2: #0055ff;
+      --data-3: #1a1a1a;
+      --data-4: #9a7300;
+      --data-context: #b5afa5;
+
+      /* Semantic */
+      --positive: #00875a;
+      --warning: #ffab00;
+      --focus: var(--tertiary);
+
+      /* Typography */
+      --font-headline: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-label: 'Space Grotesk', 'Inter', sans-serif;
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Style Effects - Authentic Bauhaus Graphic Novel */
+      --border-thick: 3px solid var(--outline);
+      --border-medium: 2px solid var(--outline);
+      --border-heavy: 4px solid var(--outline);
+      --offset-shadow: 5px 5px 0 var(--outline);
+      --offset-shadow-sm: 3px 3px 0 var(--outline);
+      --offset-shadow-lg: 8px 8px 0 var(--outline);
+      --rule-heavy: 6px solid var(--outline);
+
+      /* Spacing Scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+
+      /* Type Scale */
+      --display-size: clamp(2rem, 1.3rem + 3.2vw, 3.8rem);
+      --headline-size: clamp(1.4rem, 1.1rem + 1.4vw, 2.2rem);
+      --subhead-size: clamp(1.1rem, 0.95rem + 0.5vw, 1.35rem);
+      --body-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.0625rem);
+      --label-size: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
+    }
+
+    /* Base Reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.6;
+    }
+    header { position: static !important; }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1240px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Comic Halftone Dot Pattern Header */
+    .comic-masthead {
+      border: var(--border-heavy);
+      box-shadow: var(--offset-shadow-lg);
+      background-color: var(--surface-container-low);
+      padding: var(--space-xl) var(--space-lg);
+      position: relative;
+      overflow: hidden;
+      background-image: radial-gradient(var(--outline-variant) 1.5px, transparent 1.5px);
+      background-size: 16px 16px;
+    }
+
+    .masthead-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      border-bottom: var(--border-medium);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .comic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border: var(--border-medium);
+      padding: var(--space-xs) var(--space-sm);
+      box-shadow: var(--offset-shadow-sm);
+      font-weight: 700;
+    }
+
+    .comic-badge.red {
+      background: var(--secondary);
+      color: var(--on-primary);
+    }
+    .comic-badge.blue {
+      background: var(--tertiary);
+      color: var(--on-primary);
+    }
+
+    .main-title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0 0 var(--space-sm) 0;
+      text-transform: uppercase;
+    }
+
+    .main-title mark {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      padding: 0 var(--space-xs);
+      box-decoration-break: clone;
+      border: 2px solid var(--outline);
+      box-shadow: var(--offset-shadow-sm);
+      display: inline-block;
+      transform: rotate(-1deg);
+    }
+
+    .main-lead {
+      font-size: var(--subhead-size);
+      color: var(--on-surface-variant);
+      max-width: 75ch;
+      margin: 0 0 var(--space-md) 0;
+      font-weight: 500;
+    }
+
+    /* Controls Bar: Mode Switcher & Sound */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--surface-container);
+      border: var(--border-thick);
+      box-shadow: var(--offset-shadow-sm);
+    }
+
+    .btn-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .comic-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: var(--space-sm) var(--space-md);
+      border: var(--border-thick);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      box-shadow: var(--offset-shadow-sm);
+      cursor: pointer;
+      transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-micro);
+      text-decoration: none;
+      min-height: 42px;
+    }
+
+    .comic-btn:hover {
+      background: var(--primary);
+      color: var(--on-primary);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--offset-shadow);
+    }
+
+    .comic-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--outline);
+    }
+
+    .comic-btn.active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      box-shadow: var(--offset-shadow-sm);
+    }
+
+    .comic-btn.accent-red {
+      background: var(--secondary);
+      color: var(--on-primary);
+    }
+    .comic-btn.accent-red:hover {
+      background: var(--outline);
+      color: var(--primary-container);
+    }
+
+    .sound-toggle-btn {
+      border: var(--border-thick);
+      background: var(--surface-container-low);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      cursor: pointer;
+      padding: var(--space-sm) var(--space-md);
+      box-shadow: var(--offset-shadow-sm);
+    }
+
+    /* Episode / Chapter Navigator */
+    .chapter-nav-wrap {
+      border-top: var(--rule-heavy);
+      padding-top: var(--space-md);
+    }
+
+    .section-kicker {
+      display: inline-block;
+      font-family: var(--font-label);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: var(--space-xs) var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .chapter-track {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .chapter-tab {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      border: var(--border-thick);
+      background: var(--surface-container-low);
+      box-shadow: var(--offset-shadow-sm);
+      cursor: pointer;
+      transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro);
+    }
+
+    .chapter-tab:hover {
+      background: var(--surface-container);
+      transform: translate(-2px, -2px);
+    }
+
+    .chapter-tab.active {
+      background: var(--primary-container);
+      border-color: var(--outline);
+      box-shadow: var(--offset-shadow);
+      position: relative;
+    }
+
+    .chapter-tab .tab-num {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 800;
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+    }
+    .chapter-tab.active .tab-num {
+      color: var(--outline);
+    }
+
+    .chapter-tab .tab-title {
+      font-family: var(--font-headline);
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-top: var(--space-xs);
+    }
+
+    /* Scene Container */
+    .scene-view-card {
+      border: var(--border-heavy);
+      box-shadow: var(--offset-shadow-lg);
+      background: var(--surface-container-low);
+      padding: var(--space-xl);
+      position: relative;
+    }
+
+    .scene-header {
+      border-bottom: var(--border-thick);
+      padding-bottom: var(--space-md);
+      margin-bottom: var(--space-xl);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .scene-title-group h2 {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 800;
+      margin: var(--space-xs) 0;
+      line-height: 1.15;
+    }
+
+    .scene-subtitle {
+      font-size: var(--body-size);
+      color: var(--on-surface-variant);
+      font-style: italic;
+    }
+
+    /* Comic Grid Mode */
+    .comic-panels-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--space-lg);
+    }
+
+    /* Comic Panel Box */
+    .comic-panel {
+      border: var(--border-heavy);
+      background: var(--surface-container-low);
+      box-shadow: var(--offset-shadow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short);
+    }
+
+    .comic-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--offset-shadow-lg);
+    }
+
+    .panel-span-12 { grid-column: span 12; }
+    .panel-span-8  { grid-column: span 8; }
+    .panel-span-7  { grid-column: span 7; }
+    .panel-span-6  { grid-column: span 6; }
+    .panel-span-5  { grid-column: span 5; }
+    .panel-span-4  { grid-column: span 4; }
+
+    /* Panel Header / Number */
+    .panel-header-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-container);
+      border-bottom: var(--border-medium);
+      padding: var(--space-xs) var(--space-sm);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .panel-art-frame {
+      min-height: 240px;
+      position: relative;
+      background: var(--surface-container-high);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: var(--border-thick);
+    }
+
+    .panel-art-frame svg {
+      width: 100%;
+      height: 100%;
+      max-height: 280px;
+      display: block;
+    }
+
+    /* Sound Effect (SFX) Starburst & Badges */
+    .sfx-badge {
+      position: absolute;
+      z-index: 5;
+      font-family: var(--font-headline);
+      font-weight: 900;
+      font-size: clamp(1.2rem, 1rem + 1vw, 1.8rem);
+      padding: var(--space-xs) var(--space-md);
+      border: var(--border-thick);
+      box-shadow: var(--offset-shadow-sm);
+      cursor: pointer;
+      user-select: none;
+      transition: transform var(--dur-micro) var(--ease-out);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      animation: sfxFloat 3s ease-in-out infinite alternate;
+    }
+
+    .sfx-badge:hover {
+      transform: scale(1.1) rotate(2deg) !important;
+    }
+    .sfx-badge:active {
+      transform: scale(0.95) !important;
+    }
+
+    .sfx-yellow {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      transform: rotate(-5deg);
+    }
+
+    .sfx-red {
+      background: var(--secondary);
+      color: var(--on-primary);
+      transform: rotate(6deg);
+    }
+
+    .sfx-blue {
+      background: var(--tertiary);
+      color: var(--on-primary);
+      transform: rotate(-4deg);
+    }
+
+    @keyframes sfxFloat {
+      0% { transform: translateY(0px) rotate(-3deg); }
+      100% { transform: translateY(-4px) rotate(2deg); }
+    }
+
+    /* Comic Narration Box (Авторлық сөз) */
+    .caption-box {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border: var(--border-medium);
+      padding: var(--space-xs) var(--space-sm);
+      margin: var(--space-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.4;
+      box-shadow: 2px 2px 0 var(--outline);
+    }
+
+    .caption-box.neutral {
+      background: var(--surface-container);
+      color: var(--on-surface);
+    }
+
+    .caption-box .caption-tag {
+      font-family: var(--font-label);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 2px;
+      color: var(--on-surface-variant);
+    }
+
+    /* Speech Bubbles (Сөйлеу шарлары) */
+    .dialogue-flow {
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      flex-grow: 1;
+      background: var(--surface-container-low);
+    }
+
+    .speech-bubble {
+      position: relative;
+      background: var(--surface-container-low);
+      border: var(--border-thick);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded-lg);
+      box-shadow: 3px 3px 0 var(--outline);
+      max-width: 90%;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .bubble-speaker {
+      font-family: var(--font-label);
+      font-weight: 800;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .bubble-speaker.qozha { color: var(--tertiary); }
+    .bubble-speaker.zhantas { color: var(--secondary); }
+    .bubble-speaker.teacher { color: #8a3800; }
+    .bubble-speaker.mother { color: #007744; }
+    .bubble-speaker.qaratai { color: #6b4028; }
+    .bubble-speaker.grandma { color: #5a2e7a; }
+
+    .speech-bubble.left {
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+
+    .speech-bubble.right {
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+      background: #fffdf8;
+    }
+
+    /* Thought Bubble (Ой бұлты) */
+    .thought-bubble {
+      align-self: center;
+      background: #fbf9f4;
+      border: 3px dashed var(--outline);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded-full);
+      box-shadow: var(--offset-shadow-sm);
+      max-width: 95%;
+      font-style: italic;
+      font-size: 0.92rem;
+    }
+
+    .thought-bubble .thought-tag {
+      font-family: var(--font-label);
+      font-style: normal;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--tertiary);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* Cinematic Stepper Controls */
+    .cinematic-dock {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-md);
+      align-items: center;
+    }
+
+    .cinematic-stage {
+      width: 100%;
+      max-width: 840px;
+      margin: 0 auto;
+    }
+
+    .step-indicator-bar {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: var(--space-md);
+      justify-content: center;
+    }
+
+    .step-pip {
+      width: 16px;
+      height: 8px;
+      background: var(--outline-variant);
+      border: 2px solid var(--outline);
+      cursor: pointer;
+    }
+    .step-pip.active {
+      background: var(--primary-container);
+      width: 32px;
+    }
+
+    /* Comic Interactive Extras: Character Dossier & Kozha's Diary */
+    .interactive-extras-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+
+    .extra-card {
+      border: var(--border-heavy);
+      box-shadow: var(--offset-shadow);
+      background: var(--surface-container-low);
+      padding: var(--space-lg);
+    }
+
+    .extra-card h3 {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 800;
+      margin: 0 0 var(--space-md) 0;
+      text-transform: uppercase;
+      border-bottom: var(--border-thick);
+      padding-bottom: var(--space-xs);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Character Cards */
+    .char-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+    }
+
+    .char-chip {
+      font-family: var(--font-label);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: var(--space-xs) var(--space-sm);
+      border: var(--border-medium);
+      background: var(--surface-container);
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--outline);
+    }
+
+    .char-chip.active {
+      background: var(--primary-container);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0 var(--outline);
+    }
+
+    .char-display-box {
+      border: var(--border-thick);
+      background: var(--surface-container);
+      padding: var(--space-md);
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: var(--space-md);
+      align-items: center;
+    }
+
+    .char-avatar-slot {
+      width: 100px;
+      height: 100px;
+      border: var(--border-thick);
+      background: var(--surface-container-low);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--offset-shadow-sm);
+    }
+
+    .char-stat-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-xs);
+      font-size: 0.82rem;
+      font-family: var(--font-label);
+    }
+
+    .char-stat-bar {
+      flex-grow: 1;
+      height: 10px;
+      background: var(--surface-container-high);
+      border: 1px solid var(--outline);
+      overflow: hidden;
+    }
+    .char-stat-fill {
+      height: 100%;
+      background: var(--secondary);
+    }
+
+    /* Kozha's Interactive Diary / Dilemma */
+    .diary-container {
+      background: #faf6ee;
+      border: var(--border-thick);
+      padding: var(--space-md);
+      box-shadow: var(--offset-shadow-sm);
+      position: relative;
+    }
+
+    .diary-quote {
+      font-size: 0.95rem;
+      font-style: italic;
+      margin-bottom: var(--space-md);
+      border-left: 4px solid var(--primary-container);
+      padding-left: var(--space-md);
+    }
+
+    .dilemma-options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .dilemma-btn {
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: var(--space-sm) var(--space-md);
+      border: var(--border-medium);
+      background: var(--surface-container-low);
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--outline);
+      transition: all var(--dur-micro);
+    }
+
+    .dilemma-btn:hover {
+      background: var(--primary-container);
+      transform: translate(-1px, -1px);
+    }
+
+    .dilemma-response {
+      display: none;
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      border: var(--border-thick);
+      background: #fffcf0;
+      font-size: 0.92rem;
+    }
+
+    /* Glossary Section (Тіл қазынасы) */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+
+    .glossary-item {
+      border: var(--border-medium);
+      background: var(--surface-container-low);
+      padding: var(--space-sm) var(--space-md);
+      box-shadow: var(--offset-shadow-sm);
+    }
+
+    .glossary-term {
+      font-family: var(--font-headline);
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--secondary);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Footer */
+    .comic-footer {
+      border-top: var(--rule-heavy);
+      padding-top: var(--space-lg);
+      margin-top: var(--space-xl);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      font-size: 0.88rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* Visual Ripple for SFX play */
+    .panel-flash {
+      animation: panelFlash 0.3s ease-out;
+    }
+
+    @keyframes panelFlash {
+      0% { filter: brightness(1.3) contrast(1.1); transform: scale(1.01); }
+      100% { filter: brightness(1) contrast(1); transform: scale(1); }
+    }
+
+    /* Responsive Adaptation */
+    @media (max-width: 900px) {
+      .comic-panels-grid {
+        grid-template-columns: 1fr;
+      }
+      .panel-span-12, .panel-span-8, .panel-span-7, .panel-span-6, .panel-span-5, .panel-span-4 {
+        grid-column: span 1;
+      }
+      .interactive-extras-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid { padding: var(--space-sm); gap: var(--space-md); }
+      .comic-masthead { padding: var(--space-md); }
+      .scene-view-card { padding: var(--space-md); }
+      .char-display-box { grid-template-columns: 1fr; text-align: center; }
+      .char-avatar-slot { margin: 0 auto; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<a href="/#visuals" style="display:inline-block;margin:16px 24px;color:#1a1a1a;font-weight:700">← Мұғалім сайтына оралу</a>
+
+  <div class="page-grid">
+
+    <!-- COMIC MASTHEAD -->
+    <header class="comic-masthead">
+      <div class="masthead-strip">
+        <div class="comic-badge red">Қазақ балалар әдебиетінің классикасы</div>
+        <div>№ 1 Тұңғыш интерактивті шығарылым</div>
+        <div class="comic-badge">Бердібек Соқпақбаев</div>
+      </div>
+
+      <h1 class="main-title">
+        Менің атым — <mark>Қожа!</mark>
+      </h1>
+
+      <p class="main-lead">
+        Қазақ даласының ең бұзық, бірақ ең ақкөңіл баласы Қожаберген Қадыровтың шынайы оқиғалары.
+        Диалогтар, түпнұсқа сөздер, авторлық баяндау және дыбыстық эффектілері бар интерактивті комикс!
+      </p>
+
+      <!-- Main Controls -->
+      <div class="controls-bar">
+        <div class="btn-group" role="group" aria-label="Оқу режимі">
+          <button id="modeGridBtn" class="comic-btn active" onclick="setReadingMode('grid')">
+            <i data-lucide="layout-grid" style="width:16px;height:16px;"></i> Журналдық тор
+          </button>
+          <button id="modeCinemaBtn" class="comic-btn" onclick="setReadingMode('cinema')">
+            <i data-lucide="play-circle" style="width:16px;height:16px;"></i> Кино-кадр режимі
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button id="soundToggleBtn" class="sound-toggle-btn comic-badge" onclick="toggleAudio()" title="Комикс дыбыстарын қосу/өшіру">
+            <i id="soundIcon" data-lucide="volume-2" style="width:18px;height:18px;"></i>
+            <span id="soundStatusText">Дыбыс: Қосулы</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CHAPTER / SCENE SELECTOR -->
+    <nav class="chapter-nav-wrap" aria-label="Тарауларды таңдау">
+      <span class="section-kicker">Оқиға желісі бойынша тараулар</span>
+      <div class="chapter-track" id="chapterTrack">
+        <button class="chapter-tab active" onclick="switchScene(1)" id="tab-scene-1">
+          <span class="tab-num">1-ТАРАУ</span>
+          <span class="tab-title">Ақын баланың арманы</span>
+        </button>
+        <button class="chapter-tab" onclick="switchScene(2)" id="tab-scene-2">
+          <span class="tab-num">2-ТАРАУ</span>
+          <span class="tab-title">Менің атым — Қожа!</span>
+        </button>
+        <button class="chapter-tab" onclick="switchScene(3)" id="tab-scene-3">
+          <span class="tab-num">3-ТАРАУ</span>
+          <span class="tab-title">Тәжал мотоцикл мен Қаратай</span>
+        </button>
+        <button class="chapter-tab" onclick="switchScene(4)" id="tab-scene-4">
+          <span class="tab-num">4-ТАРАУ</span>
+          <span class="tab-title">Жанардың құмдағы ізі</span>
+        </button>
+        <button class="chapter-tab" onclick="switchScene(5)" id="tab-scene-5">
+          <span class="tab-num">5-ТАРАУ</span>
+          <span class="tab-title">Лагерь жолдамасы және дау</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- MAIN SCENE DISPLAY (COMIC STAGE) -->
+    <main class="scene-view-card" id="sceneContainer">
+      <!-- Dynamic Scene Content rendered via JS -->
+      <article class="comic-panel" id="cinemaPanelFrame" style="display:none;"></article>
+    </main>
+
+    <!-- CINEMATIC DOCK CONTROLS (Active in Cinema Mode) -->
+    <div class="cinematic-dock" id="cinemaDock">
+      <div class="btn-group">
+        <button class="comic-btn" onclick="prevCinemaFrame()">
+          <i data-lucide="chevron-left" style="width:18px;height:18px;"></i> Алдыңғы кадр
+        </button>
+        <button class="comic-btn accent-red" onclick="triggerCurrentSfx()">
+          <i data-lucide="zap" style="width:18px;height:18px;"></i> SFX Дыбыстау!
+        </button>
+        <button class="comic-btn" onclick="nextCinemaFrame()">
+          Келесі кадр <i data-lucide="chevron-right" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+      <div class="step-indicator-bar" id="cinemaPips"></div>
+    </div>
+
+    <!-- INTERACTIVE EXTRAS: CHARACTER DOSSIER & KOZHA'S DILEMMA -->
+    <section class="interactive-extras-grid">
+      <!-- Character Dossier Card -->
+      <div class="extra-card">
+        <h3>
+          <span>Кейіпкерлер досьесі</span>
+          <i data-lucide="users" style="width:20px;height:20px;"></i>
+        </h3>
+        <p style="font-size:0.88rem;color:var(--on-surface-variant);margin-bottom:var(--space-sm);">
+          Повестегі кейіпкерді таңдап, оның мінездемесі мен Қожамен қарым-қатынасын көріңіз:
+        </p>
+
+        <div class="char-selector" id="charSelector">
+          <button class="char-chip active" onclick="selectChar('qozha')">Қожа</button>
+          <button class="char-chip" onclick="selectChar('zhantas')">Жантас</button>
+          <button class="char-chip" onclick="selectChar('maikanova')">Майқанова</button>
+          <button class="char-chip" onclick="selectChar('zhanar')">Жанар</button>
+          <button class="char-chip" onclick="selectChar('millat')">Миллат ана</button>
+          <button class="char-chip" onclick="selectChar('qaratai')">Қаратай</button>
+          <button class="char-chip" onclick="selectChar('azhe')">Әжесі</button>
+        </div>
+
+        <div class="char-display-box" id="charDisplayBox">
+          <div class="char-avatar-slot" id="charAvatarSlot">
+            <!-- Dynamic character SVG avatar -->
+          </div>
+          <div>
+            <div id="charName" style="font-family:var(--font-headline);font-size:1.15rem;font-weight:800;">Қожаберген Қадыров</div>
+            <div id="charRole" style="font-size:0.85rem;color:var(--tertiary);font-weight:700;">Басты кейіпкер, «Қара Қожа», 5-сынып</div>
+            <p id="charDesc" style="font-size:0.85rem;margin:var(--space-xs) 0;line-height:1.4;">
+              Ақкөңіл, қиялшыл, әділетсіздікке жаны қас. Үнемі тәртіп бұзып көрінгенімен, жүрегі таза. Жазушы болуды армандайды.
+            </p>
+            <div class="char-stat-row">
+              <span style="width:75px;">Батылдық:</span>
+              <div class="char-stat-bar"><div id="charStat1" class="char-stat-fill" style="width:95%;"></div></div>
+            </div>
+            <div class="char-stat-row">
+              <span style="width:75px;">Қулық:</span>
+              <div class="char-stat-bar"><div id="charStat2" class="char-stat-fill" style="width:40%;background:var(--tertiary);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kozha's Secret Diary & Moral Dilemma -->
+      <div class="extra-card">
+        <h3>
+          <span>Қожаның құпия күнделігі</span>
+          <i data-lucide="book-open" style="width:20px;height:20px;"></i>
+        </h3>
+        <p style="font-size:0.88rem;color:var(--on-surface-variant);margin-bottom:var(--space-sm);">
+          Қожа әр оқиғадан кейін іштей арпалысып, өзіне-өзі есеп береді. Оған ой қосып көріңіз:
+        </p>
+
+        <div class="diary-container">
+          <div class="diary-quote" id="diaryPrompt">
+            «Майқанова мені неге сонша жек көреді? Менің тәртібім үштік болса да, сабақ үлгерімім Жантастан әлдеқайда ілгері ғой. Жантастың мұрнынан шерткенім дұрыс болды ма?»
+          </div>
+
+          <div class="dilemma-options" id="dilemmaOptions">
+            <button class="dilemma-btn" onclick="chooseDilemma(1)">
+              А) Әрине дұрыс! Мақтаншақ, жағымпаз қуларға өз тілінде жауап беру керек.
+            </button>
+            <button class="dilemma-btn" onclick="chooseDilemma(2)">
+              Ә) Қожа асығыстық жасады. Жолдаманы жұдырықпен емес, сабыр мен дәлелмен сұрау қажет еді.
+            </button>
+            <button class="dilemma-btn" onclick="chooseDilemma(3)">
+              Б) Мұғалімнің бөлмесіне баса-көктеп кіріп, есікті тарс жабу оның «тәртіпсіз» атануын күшейтті.
+            </button>
+          </div>
+
+          <div class="dilemma-response" id="dilemmaResponse"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KAZAKH CULTURAL GLOSSARY -->
+    <section class="extra-card" style="margin-top:var(--space-md);">
+      <h3>
+        <span>Повестегі байырғы сөздер мен тұрақты тіркестер</span>
+        <i data-lucide="bookmark" style="width:20px;height:20px;"></i>
+      </h3>
+      <div class="glossary-grid">
+        <div class="glossary-item">
+          <div class="glossary-term">«Тамтық неме»</div>
+          <p style="font-size:0.85rem;margin:0;">Әжесінің Қожаны еркелете әрі кейи айтатын сөзі. Тамтық — жұрнақ, қалдық дегенді білдіреді (марқұм әкесінің көзі мағынасында).</p>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">«Күбі пісу»</div>
+          <p style="font-size:0.85rem;margin:0;">Ағаш күбіге қымыз немесе айран құйып, піспекпен ырғақты қозғай отырып май алу және қымызды бабына келтіру дәстүрі.</p>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">«Соқтаңдай повесть»</div>
+          <p style="font-size:0.85rem;margin:0;">Соқтаңдай — шомбал, көлемді, сүбелі дегенді білдіреді. Қожаның қысқа өлеңді тастап, салиқалы үлкен көлемді туынды жазуға бел байлағаны.</p>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">«Қос ауыз мылтықтай»</div>
+          <p style="font-size:0.85rem;margin:0;">Қожаның кең ашылған, таңқиған танауын астарлап әжуалаған өзіне тән образды теңеуі.</p>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">«Атаңның басы!»</div>
+          <p style="font-size:0.85rem;margin:0;">Қазақ балаларының біреудің көңілге қонбайтын дәмесіне, қылығына наразылық ретінде айтатын өткір эмоционалды фразасы.</p>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">«Қара Көже»</div>
+          <p style="font-size:0.85rem;margin:0;">Жантастың Қожаның есімін әдейі бұрмалап, көже тағамына теңеп, намысына тию үшін мазақтай атаған сөзі.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="comic-footer">
+      <div>
+        <strong>«Менің атым — Қожа» интерактивті комиксі.</strong> Негізделген дереккөз: Б. Соқпақбаев шығармасы (Алматы: «Қазақпарат»).
+      </div>
+      <div style="font-family:var(--font-label);font-weight:700;">
+        Бердібек Соқпақбаев мұрасы © 1957–2026
+      </div>
+    </footer>
+
+  </div>
+
+  <api-shim></api-shim>
+
+  <script>
+    /* =======================================================================
+       AUDIO SYNTHESIZER (WEB AUDIO API) - ZERO EXTERNAL ASSETS REQUIRED
+       ======================================================================= */
+    let audioCtx = null;
+    let isSoundMuted = false;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleAudio() {
+      isSoundMuted = !isSoundMuted;
+      const statusSpan = document.getElementById('soundStatusText');
+      const icon = document.getElementById('soundIcon');
+      if (statusSpan) {
+        statusSpan.textContent = isSoundMuted ? 'Дыбыс: Өшірулі' : 'Дыбыс: Қосулы';
+      }
+      if (icon) {
+        icon.setAttribute('data-lucide', isSoundMuted ? 'volume-x' : 'volume-2');
+        window.lucide?.createIcons();
+      }
+    }
+
+    /* Comic SFX Synthesizers */
+    function playSfx(type) {
+      if (isSoundMuted) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        if (type === 'tars') {
+          // Loud door slam / punch: low thud + noise burst
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+
+          gain.gain.setValueAtTime(0.8, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.35);
+
+          // Sub impact
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(80, now);
+          osc2.frequency.exponentialRampToValueAtTime(20, now + 0.4);
+          gain2.gain.setValueAtTime(0.9, now);
+          gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.start(now);
+          osc2.stop(now + 0.4);
+
+        } else if (type === 'syrt') {
+          // Sharp comic nose flick / finger snap
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(950, now);
+          osc.frequency.exponentialRampToValueAtTime(180, now + 0.12);
+
+          gain.gain.setValueAtTime(0.7, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.12);
+
+        } else if (type === 'pyrs') {
+          // Chugging motorcycle engine sputter
+          for (let i = 0; i < 4; i++) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            const t = now + (i * 0.08);
+            osc.frequency.setValueAtTime(75, t);
+            osc.frequency.exponentialRampToValueAtTime(35, t + 0.07);
+
+            gain.gain.setValueAtTime(0.4, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.07);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.07);
+          }
+
+        } else if (type === 'gump') {
+          // Wooden butter churn (күбі) resonant thud
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(120, now);
+          osc.frequency.exponentialRampToValueAtTime(50, now + 0.28);
+
+          gain.gain.setValueAtTime(0.6, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.28);
+
+        } else if (type === 'shyrq') {
+          // Scribbling pen / paper scratch
+          for (let i = 0; i < 3; i++) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            const t = now + (i * 0.06);
+            osc.frequency.setValueAtTime(1200 + (i * 300), t);
+            osc.frequency.linearRampToValueAtTime(600, t + 0.05);
+
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.05);
+          }
+
+        } else if (type === 'durs') {
+          // Heart thumping (жүрек лүпілі): lub-dub
+          [0, 0.15].forEach((offset, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            const t = now + offset;
+            osc.frequency.setValueAtTime(idx === 0 ? 85 : 70, t);
+            osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+
+            gain.gain.setValueAtTime(0.5, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.12);
+          });
+        }
+      } catch (e) {
+        console.warn('Audio playback not allowed or failed:', e);
+      }
+    }
+
+    function animateSfxBadge(btnEl, sfxType) {
+      if (btnEl) {
+        btnEl.classList.remove('panel-flash');
+        void btnEl.offsetWidth;
+        btnEl.classList.add('panel-flash');
+      }
+      playSfx(sfxType);
+    }
+
+    /* =======================================================================
+       COMIC DATA & SVG SCENE VISUALIZATIONS
+       ======================================================================= */
+    const scenesData = [
+      {
+        id: 1,
+        title: "1-ТАРАУ: Ақын баланың үлкен арманы",
+        subtitle: "Қожаның өлең жазуға құмарлығы және соқтаңдай повесть бастауы",
+        panels: [
+          {
+            span: "panel-span-6",
+            number: "1.1 КАДР",
+            title: "Тапсырыспен өлең жазу",
+            sfx: { type: "shyrq", text: "ШЫРҚ-ШЫРҚ!", style: "sfx-yellow", top: "15px", right: "20px" },
+            caption: { tag: "ҚОЖАНЫҢ ЕСКЕ АЛУЫ", text: "«Үшінші, төртінші кластарда оқып жүргенімде-ақ ақындық даңқым бүкіл ауылға жайылды... Біреу келіп: Май туралы бір өлең жазып берші, төрт шумақ болсын дейді. Сабақ үстінде-ақ сызғылап тастаймын!»" },
+            dialogues: [
+              { speaker: "Сыныптас", role: "zhantas", text: "— Қожа, ана класта қалғып отыратындар жайында бір сықақ өлең сүйкеп жібермек пе екенсің?", type: "left" },
+              { speaker: "Қожа", role: "qozha", text: "— Қазір! Талант деген адамға туа бітетін нәрсе ғой. Тағдыр басқа салған соң, көнбеске амал қанша!", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#f4ebd9"/>
+                <!-- Classroom Blackboard -->
+                <rect x="30" y="25" width="220" height="110" fill="#284232" stroke="#1a1a1a" stroke-width="3"/>
+                <text x="50" y="60" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="14" font-weight="700">ТӘРТІП ЖӘНЕ ЕҢБЕК!</text>
+                <text x="50" y="90" fill="#ffcc00" font-family="'Inter', sans-serif" font-size="12">«Май туралы өлең...»</text>
+                <path d="M40 115 L230 115" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+                <!-- Wooden School Desk -->
+                <polygon points="120,240 450,240 420,150 160,150" fill="#c49a6c" stroke="#1a1a1a" stroke-width="3"/>
+                <polygon points="120,240 160,150 140,150 100,240" fill="#9e754a" stroke="#1a1a1a" stroke-width="2"/>
+                <rect x="180" y="165" width="100" height="60" fill="#fffef8" stroke="#1a1a1a" stroke-width="2" transform="rotate(-5 230 195)"/>
+                <line x1="190" y1="180" x2="265" y2="175" stroke="#1a1a1a" stroke-width="1.5"/>
+                <line x1="192" y1="195" x2="270" y2="190" stroke="#1a1a1a" stroke-width="1.5"/>
+                <line x1="194" y1="210" x2="250" y2="205" stroke="#1a1a1a" stroke-width="1.5"/>
+                <!-- Inkpot and quill pen -->
+                <rect x="310" y="160" width="25" height="30" fill="#1a1a1a" rx="2"/>
+                <line x1="322" y1="160" x2="350" y2="110" stroke="#e63b2e" stroke-width="3"/>
+
+                <!-- Kozha sitting and writing vigorously -->
+                <circle cx="340" cy="85" r="32" fill="#e8a87c" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Hedgehog spiky hair shaved -->
+                <path d="M312 70 Q340 42 368 70" fill="#3a2318" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M315 62 L320 50 M330 58 L335 44 M345 58 L350 44 M360 62 L368 52" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Snub nose and wink -->
+                <path d="M346 86 Q358 88 346 95" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+                <circle cx="352" cy="78" r="4" fill="#1a1a1a"/>
+                <path d="M328 78 Q334 74 340 78" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+                <!-- Mischievous grin -->
+                <path d="M336 102 Q348 114 360 102" stroke="#1a1a1a" stroke-width="3" fill="none"/>
+                <!-- Body in pioneer tie -->
+                <path d="M310 120 Q340 120 375 125 L385 200 L300 200 Z" fill="#2b59c3" stroke="#1a1a1a" stroke-width="3"/>
+                <polygon points="340,120 334,145 340,165 346,145" fill="#e63b2e" stroke="#1a1a1a" stroke-width="1.5"/>
+                <!-- Writing arm -->
+                <path d="M350 140 Q320 160 270 175" stroke="#e8a87c" stroke-width="14" stroke-linecap="round"/>
+                <line x1="270" y1="175" x2="255" y2="185" stroke="#1a1a1a" stroke-width="4"/>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-6",
+            number: "1.2 КАДР",
+            title: "Алматыға хат жолдау",
+            sfx: { type: "shyrq", text: "СЫҚЫР!", style: "sfx-blue", top: "20px", left: "20px" },
+            caption: { tag: "ҚОЖАНЫҢ ТӘУЕКЕЛІ", text: "«Күндердің бір күнінде тәуекел деп Алматыға, «Пионер» журналына бір топ өлеңімді жөнелттім. Менің астананы өлеңмен бомбалауым осылай басталды!»" },
+            dialogues: [
+              { speaker: "Қожаның ішкі үні", role: "qozha", text: "«Шіркін, ертең журнал келіп, балалар оқып: «Әй, Қожаның өлеңі басылыпты!» деп айқайласа ғой! Жанар менің ақын екенімді білер еді...»", type: "thought" },
+              { speaker: "Пошташы", role: "teacher", text: "— Әй, қара бала, осы конверттерге барлық тәттінің ақшасын құрттың ғой!", type: "left" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#ebe4d6"/>
+                <!-- Rural Village fence and post -->
+                <line x1="0" y1="210" x2="500" y2="210" stroke="#1a1a1a" stroke-width="4"/>
+                <line x1="50" y1="160" x2="50" y2="260" stroke="#8c6239" stroke-width="8"/>
+                <line x1="180" y1="160" x2="180" y2="260" stroke="#8c6239" stroke-width="8"/>
+                <line x1="320" y1="160" x2="320" y2="260" stroke="#8c6239" stroke-width="8"/>
+                <line x1="440" y1="160" x2="440" y2="260" stroke="#8c6239" stroke-width="8"/>
+
+                <!-- Blue Soviet Mailbox on Post -->
+                <rect x="260" y="60" width="120" height="130" fill="#0055ff" stroke="#1a1a1a" stroke-width="4" rx="4"/>
+                <rect x="280" y="80" width="80" height="14" fill="#1a1a1a"/>
+                <text x="320" y="130" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="16" font-weight="900" text-anchor="middle">ПОЧТА</text>
+                <circle cx="320" cy="155" r="10" fill="#ffcc00" stroke="#1a1a1a" stroke-width="2"/>
+
+                <!-- Kozha slipping the thick envelope -->
+                <circle cx="160" cy="90" r="28" fill="#e8a87c" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Shaved bristly head -->
+                <path d="M136 78 Q160 55 184 78" fill="#3a2318" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M140 68 L144 56 M155 64 L160 52 M170 65 L175 54" stroke="#1a1a1a" stroke-width="2.5"/>
+                <!-- Big hopeful eyes -->
+                <circle cx="170" cy="88" r="5" fill="#1a1a1a"/>
+                <circle cx="172" cy="86" r="1.5" fill="#ffffff"/>
+                <path d="M165 98 Q174 105 180 97" stroke="#1a1a1a" stroke-width="2.5" fill="none"/>
+                <!-- Body stretched to mailbox slot -->
+                <path d="M140 120 L180 120 L195 220 L130 220 Z" fill="#e63b2e" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Arm holding envelope -->
+                <path d="M175 130 Q230 110 285 86" stroke="#e8a87c" stroke-width="12" stroke-linecap="round"/>
+                <!-- Envelope -->
+                <rect x="270" y="70" width="38" height="26" fill="#fff" stroke="#1a1a1a" stroke-width="2" transform="rotate(-15 289 83)"/>
+                <line x1="272" y1="73" x2="300" y2="92" stroke="#e63b2e" stroke-width="1.5"/>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-7",
+            number: "1.3 КАДР",
+            title: "Редакциядан келген қатал жауап",
+            sfx: { type: "tars", text: "ТАС ТҮСКЕНДЕЙ!", style: "sfx-red", bottom: "30px", right: "30px" },
+            caption: { tag: "КӨҢІЛДІҢ ҚҰЛДЫРАУЫ", text: "«Бірақ бірде-бір өлеңім жарияланбады. Бір күні атақты ақыннан жауап келді: «Саған өлеңмен бас қатыруға әлі ерте. Өлеңдеріңнен өзіндік ештеңе таба алмадым». Бұл мен үшін төбемнен тас құлағанмен тең болды!»" },
+            dialogues: [
+              { speaker: "Қожа", role: "qozha", text: "— Қап! Мектептегі ақындық даңқыма нұқсан келтірер деп, бұл хатты ешкімге көрсетпей, табан астында жойдым...", type: "left" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#f8eada"/>
+                <!-- Editorial Letter in center with stamps -->
+                <rect x="60" y="30" width="230" height="220" fill="#ffffff" stroke="#1a1a1a" stroke-width="3" filter="drop-shadow(4px 4px 0 #1a1a1a)"/>
+                <rect x="80" y="45" width="60" height="18" fill="#e63b2e"/>
+                <text x="110" y="58" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="9" font-weight="800" text-anchor="middle">РЕДАКЦИЯ</text>
+                <!-- Red Seal Stamp -->
+                <circle cx="250" cy="65" r="22" fill="none" stroke="#cc0000" stroke-width="2" stroke-dasharray="3,2"/>
+                <text x="250" y="69" fill="#cc0000" font-family="'Space Grotesk', sans-serif" font-size="9" font-weight="700" text-anchor="middle">БАС ТАРТЫЛДЫ</text>
+
+                <!-- Letter text lines -->
+                <text x="80" y="90" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Жолдас Қадыровқа!</text>
+                <line x1="80" y1="110" x2="260" y2="110" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="80" y1="130" x2="270" y2="130" stroke="#1a1a1a" stroke-width="1.5"/>
+                <text x="80" y="155" font-family="'Inter', sans-serif" font-size="11" fill="#cc0000" font-weight="700">«Өзіндік ештеңе таппадым...»</text>
+                <line x1="80" y1="175" x2="250" y2="175" stroke="#1a1a1a" stroke-width="1.5"/>
+                <line x1="80" y1="195" x2="210" y2="195" stroke="#1a1a1a" stroke-width="1.5"/>
+
+                <!-- Kozha shocked clutching head -->
+                <circle cx="390" cy="110" r="38" fill="#e8a87c" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Shaved prickly hair -->
+                <path d="M358 92 Q390 65 422 92" fill="#3a2318" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Wide shocked eyes -->
+                <circle cx="375" cy="105" r="8" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+                <circle cx="375" cy="105" r="3" fill="#1a1a1a"/>
+                <circle cx="405" cy="105" r="8" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+                <circle cx="405" cy="105" r="3" fill="#1a1a1a"/>
+                <!-- Mouth open in agony -->
+                <ellipse cx="390" cy="130" rx="9" ry="12" fill="#1a1a1a"/>
+                <!-- Comic sweat droplets -->
+                <path d="M340 95 Q335 85 345 80 Q350 90 340 95 Z" fill="#0055ff"/>
+                <path d="M435 95 Q445 85 435 80 Q430 90 435 95 Z" fill="#0055ff"/>
+                <!-- Hands clutching head -->
+                <circle cx="350" cy="110" r="14" fill="#e8a87c" stroke="#1a1a1a" stroke-width="2.5"/>
+                <circle cx="430" cy="110" r="14" fill="#e8a87c" stroke="#1a1a1a" stroke-width="2.5"/>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-5",
+            number: "1.4 КАДР",
+            title: "Батыл байлам: «Повесть жазамын!»",
+            sfx: { type: "shyrq", text: "СЕРТ!", style: "sfx-yellow", top: "25px", right: "20px" },
+            caption: { tag: "ЖАЗУШЫНЫҢ ҚАДАМЫ", text: "«Мейлі, баспаса баспай-ақ қойсын! Мен армандаған нысанамнан жалтармаймын. Енді өлеңді қойып, соқтаңдай повесть жазғалы отырмын. Бәрі кітаптағыдай болу үшін оқиғаларды тарау-тарауға бөлемін. Өтірік ештеңе қоспаймын!»" },
+            dialogues: [
+              { speaker: "Қожа", role: "qozha", text: "— Бастаймын! Бірінші тарау: «Оқушы менімен танысады!».", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#ffcc00"/>
+                <!-- Stylized Comic Burst -->
+                <polygon points="250,20 280,90 350,60 320,130 390,140 320,170 360,240 280,210 250,270 210,200 140,240 170,170 100,140 180,120 140,50 220,80" fill="#ffffff" stroke="#1a1a1a" stroke-width="4"/>
+                <!-- Pen held aloft like a sword -->
+                <line x1="250" y1="180" x2="250" y2="40" stroke="#1a1a1a" stroke-width="12" stroke-linecap="round"/>
+                <polygon points="238,40 250,15 262,40" fill="#e63b2e" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Notebook cover -->
+                <rect x="175" y="140" width="150" height="100" fill="#0055ff" stroke="#1a1a1a" stroke-width="3" rx="2" transform="rotate(-5 250 190)"/>
+                <text x="240" y="180" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="14" font-weight="900" text-anchor="middle">МЕНІҢ АТЫМ —</text>
+                <text x="240" y="205" fill="#ffcc00" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="900" text-anchor="middle">ҚОЖА</text>
+              </svg>
+            `
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "2-ТАРАУ: Менің атым — Қожа! Айна алдындағы сыр",
+        subtitle: "Есімнің сыры, Жантастың мазағы және марқұм Қадыр әкеге сағыныш",
+        panels: [
+          {
+            span: "panel-span-7",
+            number: "2.1 КАДР",
+            title: "Есім қалай өзгерді?",
+            sfx: { type: "syrt", text: "ТАРАҚ!", style: "sfx-yellow", top: "15px", left: "20px" },
+            caption: { tag: "ЕСІМ ТАРИХЫ", text: "«Шынымды айтсам, бұл о баста Қожа емес, Қожаберген екен. Бірақ дүниеде не құбылыстар бола беретіні тәрізді, «Қожабергеннің» құйрығы үзіліп түсіп қалған. Біз бір класта екі Қожамыз: Сүттібайдың баласы — Сары Қожа, ал мен — Қара Қожа!»" },
+            dialogues: [
+              { speaker: "Қожа", role: "qozha", text: "— Атымды айта бастасам, тілім таңдайыма жабысып қалғандай болады. Мұрат, Болат, Бақыт деген қандай жарасымды аттар!", type: "left" },
+              { speaker: "Жантас", role: "zhantas", text: "— Әй, Қара Көже! Бері қара!", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#f2ecde"/>
+                <!-- Splitting Name Banner -->
+                <rect x="50" y="40" width="220" height="60" fill="#0055ff" stroke="#1a1a1a" stroke-width="3" rx="2"/>
+                <text x="160" y="78" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="24" font-weight="900" text-anchor="middle">ҚОЖА</text>
+
+                <!-- Broken tail piece falling -->
+                <g transform="translate(290, 80) rotate(25)">
+                  <rect x="0" y="0" width="140" height="50" fill="#e63b2e" stroke="#1a1a1a" stroke-width="3" stroke-dasharray="4,2"/>
+                  <text x="70" y="32" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="700" text-anchor="middle">-БЕРГЕН</text>
+                  <!-- Jagged crack line -->
+                  <path d="M-10 10 L0 25 L-10 40" stroke="#1a1a1a" stroke-width="3" fill="none"/>
+                </g>
+
+                <!-- Two Kozhas comparison in classroom -->
+                <!-- Sary Qozha (fair) -->
+                <circle cx="120" cy="190" r="26" fill="#fbe3b5" stroke="#1a1a1a" stroke-width="2.5"/>
+                <path d="M96 175 Q120 155 144 175" fill="#f0c040" stroke="#1a1a1a" stroke-width="2"/>
+                <text x="120" y="235" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700" text-anchor="middle">Сары Қожа</text>
+
+                <!-- Qara Qozha (our hero) -->
+                <circle cx="240" cy="180" r="32" fill="#d99b66" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Hedgehog spiky bristle -->
+                <path d="M214 160 Q240 135 266 160" fill="#2a1a10" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M218 150 L220 138 M230 144 L233 132 M243 144 L245 132 M255 150 L260 140" stroke="#1a1a1a" stroke-width="2.5"/>
+                <!-- Snub nose -->
+                <ellipse cx="248" cy="184" rx="4" ry="6" fill="#1a1a1a"/>
+                <text x="240" y="235" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800" text-anchor="middle">Қара Қожа (Мен)</text>
+
+                <!-- Teasing Zhantas -->
+                <circle cx="390" cy="185" r="24" fill="#eed5b7" stroke="#1a1a1a" stroke-width="2.5"/>
+                <path d="M375 168 Q390 150 405 168" fill="#4a3b32" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Sly squint eyes -->
+                <line x1="380" y1="180" x2="388" y2="182" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="394" y1="182" x2="402" y2="180" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M382 195 Q392 202 400 193" stroke="#e63b2e" stroke-width="2" fill="none"/>
+                <text x="390" y="235" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700" text-anchor="middle">Жантас (Қу)</text>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-5",
+            number: "2.2 КАДР",
+            title: "Әке сағынышы",
+            sfx: { type: "durs", text: "ЛҮП-ЛҮП...", style: "sfx-red", top: "20px", right: "20px" },
+            caption: { tag: "ЖАН ЖАРАСЫ", text: "«Әке деген сөзді айтқанда, жүрегім қарс айрыла жаздайды-ау! Мен әкемнің қандай адам екенін де білмеймін. Ол майданға аттанғанда, мен екі жастамын... Сүттей аппақ әкем мол кетті, оралмады... Кімге де болса бір әке әбден керек!»" },
+            dialogues: [
+              { speaker: "Қожаның мұңы", role: "qozha", text: "«Егер әкем тірі болса, мен мұндай сотқар болмас па едім... Мамам да оңашада әкемнің суретіне қарап, көзіне жас алмас еді.»", type: "thought" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#322822"/>
+                <!-- Framed portrait of father Qadyr in military uniform -->
+                <rect x="150" y="25" width="200" height="225" fill="#e8dfcf" stroke="#ffcc00" stroke-width="6"/>
+                <!-- Inner sepia photo -->
+                <rect x="165" y="40" width="170" height="195" fill="#cfbeaa" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Soldier Father bust -->
+                <circle cx="250" cy="100" r="36" fill="#ba9f83" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Red Army pilotka cap with star -->
+                <path d="M218 80 Q250 55 282 80 L285 92 L215 92 Z" fill="#60664d" stroke="#1a1a1a" stroke-width="2"/>
+                <polygon points="250,72 253,79 260,79 255,83 257,90 250,86 243,90 245,83 240,79 247,79" fill="#cc0000"/>
+                <!-- Gentle proud eyes and mustache -->
+                <circle cx="240" cy="102" r="3.5" fill="#1a1a1a"/>
+                <circle cx="260" cy="102" r="3.5" fill="#1a1a1a"/>
+                <path d="M238 115 Q250 110 262 115" stroke="#1a1a1a" stroke-width="3" fill="none"/>
+                <!-- Military Collar and Gimnasterka -->
+                <path d="M205 155 Q250 145 295 155 L310 230 L190 230 Z" fill="#686e52" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Red lapels -->
+                <polygon points="230,150 242,150 238,170 226,170" fill="#cc0000"/>
+                <polygon points="270,150 258,150 262,170 274,170" fill="#cc0000"/>
+                <!-- Inscription below -->
+                <text x="250" y="258" fill="#ffcc00" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700" text-anchor="middle">ҚАДЫР ӘКЕ БЕЙНЕСІ</text>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-12",
+            number: "2.3 КАДР",
+            title: "Айна алдындағы автопортрет: «Қос ауыз мылтықтай танау»",
+            sfx: { type: "syrt", text: "СЫРТ!", style: "sfx-yellow", top: "20px", right: "40px" },
+            caption: { tag: "КЕЙІПКЕР ПОРТРЕТІ", text: "«Әжем мені «Тамтық неме» дейді. Рас екен ғой. Екі танауыма екі саусағым еркін сыйып кетерлік қос ауыз мылтықтың аузындай үңірейіп тұр! Басым қарбыз тәрізді доп-домалақ, тыр-тықыр. Шашымды Әубәкір шал кеше ғана ұстарамен сыпырып тастаған. Бойым 139 сантиметр. Жасым он екіде!»" },
+            dialogues: [
+              { speaker: "Әубәкір шал", role: "teacher", text: "— Япыр-ай, мынау шаш емес, шошқаның қылшығынан бір кем емес тікенек қой! Ұстарамның жүзін кетірді!", type: "left" },
+              { speaker: "Қожа", role: "qozha", text: "— Сол жақ құлағымның астында түйір қалым бар. Бетімнің ұшына бітсе, әдемірек көрінер ме едім? Бесінші класты бітіріп отырмын!", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+                <rect width="800" height="240" fill="#fbf7ef"/>
+                <!-- Old wooden mirror frame -->
+                <rect x="250" y="15" width="300" height="210" fill="#e3dbcb" stroke="#1a1a1a" stroke-width="4" rx="4"/>
+                <rect x="270" y="30" width="260" height="180" fill="#d8eaf5" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Mirror shine reflections -->
+                <polygon points="275,35 340,35 300,205 275,205" fill="rgba(255,255,255,0.4)"/>
+                <polygon points="360,35 390,35 320,205 290,205" fill="rgba(255,255,255,0.3)"/>
+
+                <!-- Kozha looking into mirror -->
+                <circle cx="400" cy="115" r="50" fill="#e0a370" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Shaved bristly hair sticking out like pins -->
+                <path d="M355 85 Q400 48 445 85" fill="#2d1d14" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="365" y1="75" x2="368" y2="58" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="380" y1="68" x2="383" y2="50" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="398" y1="64" x2="400" y2="45" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="416" y1="68" x2="418" y2="50" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="432" y1="75" x2="435" y2="58" stroke="#1a1a1a" stroke-width="3"/>
+
+                <!-- Snub nose like double barrel gun -->
+                <ellipse cx="393" cy="122" rx="6" ry="8" fill="#1a1a1a"/>
+                <ellipse cx="407" cy="122" rx="6" ry="8" fill="#1a1a1a"/>
+                <path d="M386 112 Q400 115 414 112" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+
+                <!-- Mole under left ear -->
+                <circle cx="356" cy="138" r="4.5" fill="#3a1c0d"/>
+
+                <!-- Big expressive eyes -->
+                <circle cx="380" cy="100" r="7" fill="#1a1a1a"/>
+                <circle cx="382" cy="98" r="2" fill="#fff"/>
+                <circle cx="420" cy="100" r="7" fill="#1a1a1a"/>
+                <circle cx="422" cy="98" r="2" fill="#fff"/>
+
+                <!-- Cheeky grin -->
+                <path d="M382 142 Q400 156 418 142" stroke="#1a1a1a" stroke-width="3.5" fill="none"/>
+
+                <!-- Height measurement ruler on the right -->
+                <rect x="620" y="20" width="30" height="200" fill="#ffcc00" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="620" y1="40" x2="635" y2="40" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="620" y1="80" x2="645" y2="80" stroke="#1a1a1a" stroke-width="3"/>
+                <text x="655" y="85" font-family="'Space Grotesk', sans-serif" font-size="14" font-weight="900">139 см</text>
+                <line x1="620" y1="120" x2="635" y2="120" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="620" y1="160" x2="635" y2="160" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="620" y1="200" x2="635" y2="200" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Barber razor on left table -->
+                <g transform="translate(100, 100) rotate(-25)">
+                  <rect x="0" y="0" width="80" height="14" fill="#1a1a1a" rx="2"/>
+                  <rect x="20" y="-12" width="65" height="12" fill="#d0d0d0" stroke="#1a1a1a" stroke-width="2"/>
+                  <text x="40" y="32" font-family="'Space Grotesk', sans-serif" font-size="10" font-weight="700">Әубәкір ұстарасы</text>
+                </g>
+              </svg>
+            `
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "3-ТАРАУ: Тәжал мотоцикл және Қаратай",
+        subtitle: "Үйдегі күдікті қонақ, күбі піскен әже және Қожаның қызғанышы",
+        panels: [
+          {
+            span: "panel-span-6",
+            number: "3.1 КАДР",
+            title: "Есік алдындағы үш аяқты «Тәжал»",
+            sfx: { type: "pyrs", text: "ПЫРС-ПЫРС!", style: "sfx-red", top: "15px", right: "20px" },
+            caption: { tag: "ҚОЖАНЫҢ АШУЫ", text: "«Күні бойы футбол ойнап, өлердей шаршап үйге келе жатсам — көзім есік алдындағы үш дөңгелекті, көкшіл көне мотоциклге түсті! Тәжал десем тәжал. Мотоциклдің иесі — әжім-әжім комбайншы Қаратай!»" },
+            dialogues: [
+              { speaker: "Қожа", role: "qozha", text: "— Атаңның басы, менің мамам саған тиер дейсің бе! (Дөңгелекті бар пәрменімен теуіп жібердім: ДҮРС!)", type: "left" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#ede5d5"/>
+                <!-- Village Yard Ground & Fence -->
+                <line x1="0" y1="230" x2="500" y2="230" stroke="#1a1a1a" stroke-width="4"/>
+                <polygon points="40,230 40,140 70,140 70,230" fill="#a07850" stroke="#1a1a1a" stroke-width="2"/>
+                <polygon points="75,230 75,135 105,135 105,230" fill="#a07850" stroke="#1a1a1a" stroke-width="2"/>
+
+                <!-- Three-wheeled Soviet Motorcycle with Sidecar (Көкшіл мотоцикл) -->
+                <!-- Wheels -->
+                <circle cx="220" cy="210" r="32" fill="#1a1a1a"/>
+                <circle cx="220" cy="210" r="18" fill="#a0a0a0" stroke="#1a1a1a" stroke-width="2"/>
+                <circle cx="360" cy="210" r="32" fill="#1a1a1a"/>
+                <circle cx="360" cy="210" r="18" fill="#a0a0a0" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Sidecar wheel behind -->
+                <circle cx="300" cy="195" r="24" fill="#3a3a3a"/>
+
+                <!-- Bike Body & Tank -->
+                <path d="M200 180 L250 140 L320 140 L350 170 L280 190 Z" fill="#2d6a4f" stroke="#1a1a1a" stroke-width="3"/>
+                <path d="M260 140 Q285 120 315 140 Z" fill="#52b788" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Handlebars and round headlight -->
+                <line x1="230" y1="160" x2="210" y2="120" stroke="#1a1a1a" stroke-width="4"/>
+                <circle cx="205" cy="120" r="12" fill="#ffea00" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Exhaust Pipe blowing smoke -->
+                <path d="M260 190 L380 200" stroke="#1a1a1a" stroke-width="5"/>
+                <!-- Smoke puff -->
+                <circle cx="410" cy="195" r="12" fill="#d0d0d0" stroke="#1a1a1a" stroke-width="1.5"/>
+                <circle cx="430" cy="188" r="18" fill="#b8b8b8" stroke="#1a1a1a" stroke-width="1.5"/>
+
+                <!-- Kozha kicking the tire in anger -->
+                <circle cx="120" cy="110" r="26" fill="#e0a370" stroke="#1a1a1a" stroke-width="2.5"/>
+                <path d="M98 96 Q120 75 142 96" fill="#2d1d14" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Fierce angry eyes -->
+                <line x1="110" y1="104" x2="120" y2="108" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="132" y1="108" x2="122" y2="104" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Kicking leg -->
+                <path d="M110 135 L125 185 L188 205" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round" fill="none"/>
+                <!-- Soccer ball on the ground -->
+                <circle cx="70" cy="215" r="16" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.5"/>
+                <polygon points="70,205 78,211 75,220 65,220 62,211" fill="#1a1a1a"/>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-6",
+            number: "3.2 КАДР",
+            title: "Әжем күбі пісіп отыр",
+            sfx: { type: "gump", text: "ГҮМП-ГҮМП!", style: "sfx-yellow", bottom: "30px", left: "20px" },
+            caption: { tag: "АУЫЛ ТҰРМЫСЫ", text: "«Ауыз үйде әжем күбі пісіп тұр екен. Ертеден қара кешке тыным таппайтын бейнетқор асыл әжем-ай! Күмпілдетіп піскенде күбінің түбін түсіре жаздайды. Шәй құйған кесесін ұстап тұрып: — Әй, мына түріңмен қайда барасың? Онда кісі отыр! — деді.»" },
+            dialogues: [
+              { speaker: "Әжесі", role: "grandma", text: "— Әй, қара қасқа, үйге бұлай баса-көктеп кірме, кісі бар!", type: "left" },
+              { speaker: "Қожа", role: "qozha", text: "— Кісі болса қайтушы едім?! (Төргі үйге тура тарттым!)", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#f5ede0"/>
+                <!-- Traditional Yurt Wooden Door & Kazakh Carpet (Текемет) -->
+                <rect x="20" y="20" width="130" height="220" fill="#8b4513" stroke="#1a1a1a" stroke-width="3"/>
+                <rect x="40" y="40" width="90" height="180" fill="#a0522d" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M40 70 L130 150 M130 70 L40 150" stroke="#1a1a1a" stroke-width="2"/>
+
+                <!-- Kazakh Ornamented Rug on Wall -->
+                <rect x="180" y="25" width="280" height="80" fill="#cc0000" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Kazakh Ram Horn Ornament (Қошқар мүйіз) -->
+                <path d="M220 65 Q205 40 225 40 Q240 50 235 65 Q245 40 265 40 Q280 50 270 65" stroke="#ffcc00" stroke-width="4" fill="none"/>
+                <path d="M340 65 Q325 40 345 40 Q360 50 355 65 Q365 40 385 40 Q400 50 390 65" stroke="#ffcc00" stroke-width="4" fill="none"/>
+
+                <!-- Wooden Butter Churn (Күбі) -->
+                <polygon points="300,240 360,240 350,140 310,140" fill="#a06830" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="305" y1="165" x2="355" y2="165" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="302" y1="205" x2="358" y2="205" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Churning Stick (Піспек) with motion lines -->
+                <line x1="330" y1="80" x2="330" y2="180" stroke="#1a1a1a" stroke-width="6"/>
+                <path d="M315 110 L315 90 M345 110 L345 90" stroke="#0055ff" stroke-width="2"/>
+
+                <!-- Grandmother in traditional white Kimeshek (Ақ кимешек) -->
+                <circle cx="250" cy="130" r="26" fill="#e2b896" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- White Kimeshek covering head, neck and chest -->
+                <path d="M220 120 Q250 85 280 120 L290 220 L210 220 Z" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+                <ellipse cx="250" cy="132" rx="14" ry="18" fill="#e2b896"/>
+                <!-- Kind wrinkled grandmother face -->
+                <line x1="242" y1="128" x2="246" y2="129" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="254" y1="129" x2="258" y2="128" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M245 142 Q250 145 255 142" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+                <!-- Hands gripping churn stick -->
+                <ellipse cx="325" cy="120" rx="10" ry="7" fill="#e2b896" stroke="#1a1a1a" stroke-width="2"/>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-12",
+            number: "3.3 КАДР",
+            title: "Төргі бөлме: Шпиондық барлау және Қаратайдың қашуы",
+            sfx: { type: "pyrs", text: "ТАТ-ТАТ-ТАТ!", style: "sfx-red", top: "25px", right: "50px" },
+            caption: { tag: "ҚАҚТЫҒЫС", text: "«Қаратай мен мамам терезе алдындағы столда бетпе-бет әңгімелесіп отыр. Мен шкафтан кітап іздегенсіп, бөгеліп тұрып алдым. Кенет мамамның: — Балам, есікті солай күйбеңдеп, таба алмай жатқаның не зат? — деген салиқалы да қатал даусы шықты. Қаратай бұл жолы ұзақ отыра алмады, қысылып сыртқа шығып, мотоциклін патырлатып оталдырып зыта жөнелді!»" },
+            dialogues: [
+              { speaker: "Миллат ана", role: "mother", text: "— Қаратай, менің өсіп келе жатқан ұлым бар. Мен байға тимеймін.", type: "left" },
+              { speaker: "Қаратай", role: "qaratai", text: "— Бәйбіше, қош болыңыз ендеше... (Қысылып шығып кетті).", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+                <rect width="800" height="240" fill="#f7f2e7"/>
+                <!-- Tea Table in Front of Window -->
+                <rect x="300" y="30" width="200" height="110" fill="#87ceeb" stroke="#1a1a1a" stroke-width="3"/>
+                <line x1="400" y1="30" x2="400" y2="140" stroke="#ffffff" stroke-width="4"/>
+                <line x1="300" y1="85" x2="500" y2="85" stroke="#ffffff" stroke-width="4"/>
+
+                <!-- Wooden Round Table with Samovar and Pialas -->
+                <ellipse cx="400" cy="175" rx="130" ry="45" fill="#c29b68" stroke="#1a1a1a" stroke-width="4"/>
+                <!-- Russian Samovar in center -->
+                <rect x="385" y="125" width="30" height="40" fill="#ffcc00" stroke="#1a1a1a" stroke-width="2"/>
+                <ellipse cx="400" cy="125" rx="18" ry="6" fill="#ffcc00" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Kazakh tea pialas -->
+                <ellipse cx="340" cy="170" rx="12" ry="7" fill="#ffffff" stroke="#cc0000" stroke-width="2"/>
+                <ellipse cx="460" cy="170" rx="12" ry="7" fill="#ffffff" stroke="#0055ff" stroke-width="2"/>
+
+                <!-- Mother Millat (Left, graceful, strict) -->
+                <circle cx="230" cy="120" r="30" fill="#e8b593" stroke="#1a1a1a" stroke-width="2.5"/>
+                <!-- Traditional hair braids and modern 1950s Soviet collar dress -->
+                <path d="M205 105 Q230 85 255 105 L260 140 L200 140 Z" fill="#1a1a1a"/>
+                <path d="M195 145 L265 145 L275 230 L185 230 Z" fill="#2d6a4f" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Stern composed expression -->
+                <line x1="220" y1="118" x2="230" y2="119" stroke="#1a1a1a" stroke-width="2"/>
+                <line x1="235" y1="119" x2="245" y2="118" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M225 132 Q232 130 240 132" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+
+                <!-- Qaratay (Right, bearded, uneasy combine operator) -->
+                <circle cx="570" cy="120" r="30" fill="#d9986b" stroke="#1a1a1a" stroke-width="2.5"/>
+                <!-- Dusty flat cap -->
+                <ellipse cx="570" cy="95" rx="35" ry="12" fill="#5c5042" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Bristly beard stubble -->
+                <path d="M545 125 Q570 155 595 125" fill="#3a2e24" stroke="#1a1a1a" stroke-width="1.5"/>
+                <!-- Awkward sweat droplets -->
+                <circle cx="535" cy="115" r="3" fill="#0055ff"/>
+                <path d="M535 145 L605 145 L615 230 L525 230 Z" fill="#6c757d" stroke="#1a1a1a" stroke-width="3"/>
+
+                <!-- Kozha on far left corner looking through open cupboard -->
+                <rect x="40" y="40" width="110" height="190" fill="#8b5a2b" stroke="#1a1a1a" stroke-width="3"/>
+                <rect x="50" y="55" width="40" height="70" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
+                <circle cx="110" cy="130" r="24" fill="#e0a370" stroke="#1a1a1a" stroke-width="2.5"/>
+                <!-- Peeking eye with intense focus -->
+                <circle cx="120" cy="128" r="5" fill="#1a1a1a"/>
+              </svg>
+            `
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "4-ТАРАУ: Жанардың құмдағы ізі",
+        subtitle: "Өзен жағасындағы тәтті қиял, алғашқы махаббат және Жанар бейнесі",
+        panels: [
+          {
+            span: "panel-span-6",
+            number: "4.1 КАДР",
+            title: "Сыныптың үздігі — Жанар",
+            sfx: { type: "durs", text: "СЫЛДЫР!", style: "sfx-blue", top: "15px", right: "20px" },
+            caption: { tag: "ҚОЖАНЫҢ СҮЙІКТІСІ", text: "«Жанар... Атың қандай әдемі! Кластағы ең бір ақылды қыз. Екіншіден, сұлу. Әсіресе қызыл береткасын киіп жүргенде құлпырып кетеді. Басына үкілі тақия киіп, «Қамажайға» билегенін көрсең, мың бұралып тұрған өнерлі қыз. Ол — кластағы бірінші үздік оқушы!»" },
+            dialogues: [
+              { speaker: "Қожа", role: "qozha", text: "«Шіркін, Жанарға бар сырымды ашып: «Қожа осындай екен ғой, түбінде талант жарып шықпай қоймайды» дегізсем ғой!»", type: "thought" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#fcf4f6"/>
+                <!-- Romantic background aura -->
+                <circle cx="250" cy="130" r="105" fill="#ffe5ec" stroke="#e63b2e" stroke-width="2" stroke-dasharray="5,3"/>
+
+                <!-- Zhanar in Red Beret -->
+                <circle cx="250" cy="115" r="38" fill="#fcdbc9" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Iconic Red Beret (Қызыл беретка) tilted playfully -->
+                <ellipse cx="245" cy="82" rx="46" ry="16" fill="#e63b2e" stroke="#1a1a1a" stroke-width="3" transform="rotate(-10 245 82)"/>
+                <circle cx="225" cy="74" r="5" fill="#cc0000"/>
+
+                <!-- Two long beautiful braids with Kazakh ribbon sholpy -->
+                <path d="M216 125 Q205 170 200 220" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round"/>
+                <path d="M284 125 Q295 170 300 220" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round"/>
+                <!-- Silver sholpy pendants -->
+                <circle cx="200" cy="225" r="6" fill="#ffcc00" stroke="#1a1a1a" stroke-width="1.5"/>
+                <circle cx="300" cy="225" r="6" fill="#ffcc00" stroke="#1a1a1a" stroke-width="1.5"/>
+
+                <!-- Beautiful kind face -->
+                <circle cx="236" cy="112" r="4.5" fill="#1a1a1a"/>
+                <circle cx="264" cy="112" r="4.5" fill="#1a1a1a"/>
+                <path d="M242 132 Q250 140 258 132" stroke="#e63b2e" stroke-width="3" fill="none"/>
+                <!-- Pioneer scarf and white shirt -->
+                <polygon points="250,150 242,175 250,195 258,175" fill="#e63b2e" stroke="#1a1a1a" stroke-width="1.5"/>
+                <path d="M215 155 L285 155 L295 240 L205 240 Z" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-6",
+            number: "4.2 КАДР",
+            title: "Өзеннің дымқыл құмындағы із",
+            sfx: { type: "durs", text: "ДҮРС-ДҮРС!", style: "sfx-red", bottom: "25px", right: "20px" },
+            caption: { tag: "ҚОЖАНЫҢ ТӘТТІ СЕЗІМІ", text: "«Судың шетіндегі дымқыл құмда біреудің жалаңаяқ ізі сайрап жатыр. Мүмкін, осы Жанардың ізі шығар? Тәтті бір сезім бойымды билеп, үнсіз тұрып қаламын. Аяғымды жанына салып едім, із кішілеу екен. Иә, бұл — Жанардың ізі!»" },
+            dialogues: [
+              { speaker: "Қожаның монологы", role: "qozha", text: "«Егер адам әуелі үлкен болып жаратылып, өмірде атақты жазушы болған соң барып балаға айналса... Сонда Майқанова маған қалай қарар еді?!»", type: "thought" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#f0db99"/>
+                <!-- River Water with cool blue ripple lines -->
+                <path d="M0 60 Q120 40 250 65 Q380 90 500 50 L500 0 L0 0 Z" fill="#3a86ff"/>
+                <path d="M0 60 Q120 40 250 65 Q380 90 500 50" stroke="#ffffff" stroke-width="3" fill="none"/>
+                <!-- Willows and reeds in background -->
+                <line x1="30" y1="60" x2="30" y2="20" stroke="#2d6a4f" stroke-width="4"/>
+                <line x1="45" y1="55" x2="50" y2="15" stroke="#2d6a4f" stroke-width="3"/>
+                <line x1="460" y1="50" x2="465" y2="10" stroke="#2d6a4f" stroke-width="4"/>
+
+                <!-- Wet River Sand Ground -->
+                <!-- Zhanar's delicate small footprint -->
+                <g transform="translate(190, 110)">
+                  <!-- Main foot sole -->
+                  <ellipse cx="25" cy="50" rx="14" ry="24" fill="#d4b572" stroke="#1a1a1a" stroke-width="2"/>
+                  <ellipse cx="25" cy="20" rx="18" ry="16" fill="#d4b572" stroke="#1a1a1a" stroke-width="2"/>
+                  <!-- 5 toes -->
+                  <circle cx="12" cy="4" r="4" fill="#d4b572" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="20" cy="1" r="4.5" fill="#d4b572" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="28" cy="2" r="4" fill="#d4b572" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="35" cy="5" r="3.5" fill="#d4b572" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="41" cy="9" r="3" fill="#d4b572" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <text x="25" y="90" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700" fill="#e63b2e" text-anchor="middle">Жанардың ізі</text>
+                </g>
+
+                <!-- Kozha's bigger barefoot stepping close -->
+                <g transform="translate(280, 120)">
+                  <ellipse cx="30" cy="60" rx="18" ry="28" fill="#c49e58" stroke="#1a1a1a" stroke-width="2.5"/>
+                  <ellipse cx="30" cy="25" rx="22" ry="20" fill="#c49e58" stroke="#1a1a1a" stroke-width="2.5"/>
+                  <!-- Toes -->
+                  <circle cx="14" cy="5" r="5.5" fill="#c49e58" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="25" cy="2" r="5" fill="#c49e58" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="35" cy="3" r="4.5" fill="#c49e58" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="44" cy="6" r="4" fill="#c49e58" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <circle cx="51" cy="11" r="3.5" fill="#c49e58" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <text x="30" y="105" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700" fill="#1a1a1a" text-anchor="middle">Қожаның аяғы</text>
+                </g>
+
+                <!-- Little heart ripples -->
+                <path d="M250 85 C250 78 240 75 235 82 C230 75 220 78 220 85 C220 95 235 105 235 105 C235 105 250 95 250 85 Z" fill="#e63b2e" stroke="#1a1a1a" stroke-width="1"/>
+              </svg>
+            `
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "5-ТАРАУ: Лагерь жолдамасы және Майқанова",
+        subtitle: "Жантастың мақтануы, мұғалімдер бөлмесіндегі дау және тарс жабылған есік",
+        panels: [
+          {
+            span: "panel-span-6",
+            number: "5.1 КАДР",
+            title: "Жантастың қағазды сыртылдатуы",
+            sfx: { type: "syrt", text: "СЫРТ!", style: "sfx-yellow", top: "15px", right: "20px" },
+            caption: { tag: "ЫЗА БОЛУ", text: "«Қолымда добым бар, мектептің спорт алаңына келе жатсам, Жантас ұшыраса кетті. Қолында мөр басылған жалтырақ қағазы бар. — Қара Көже, мынаның не екенін білесің бе? Лагерьге жолдама! Біз баратын болдық, ал сен ауылда қаласың! — деді шіреніп.»" },
+            dialogues: [
+              { speaker: "Жантас", role: "zhantas", text: "— Сені тізімге де қоспаған! Майқанова апай бізге берді!", type: "left" },
+              { speaker: "Қожа", role: "qozha", text: "— Көрерміз кімнің қалатынын! (Танауынан сырт еткізіп бірді шерттім!)", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#f5ede0"/>
+                <!-- School Sports Ground Fence and Goalpost -->
+                <line x1="0" y1="230" x2="500" y2="230" stroke="#1a1a1a" stroke-width="4"/>
+                <line x1="30" y1="90" x2="30" y2="230" stroke="#ffffff" stroke-width="6"/>
+                <line x1="30" y1="90" x2="110" y2="90" stroke="#ffffff" stroke-width="6"/>
+
+                <!-- Smug Zhantas holding stamped voucher -->
+                <circle cx="180" cy="115" r="28" fill="#e8cbb0" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Slick hair parted in middle -->
+                <path d="M155 102 Q180 82 205 102" fill="#2d1d14" stroke="#1a1a1a" stroke-width="2"/>
+                <!-- Teasing face sticking tongue out -->
+                <circle cx="170" cy="112" r="3.5" fill="#1a1a1a"/>
+                <circle cx="190" cy="112" r="3.5" fill="#1a1a1a"/>
+                <path d="M174 128 Q180 138 186 128" fill="#e63b2e" stroke="#1a1a1a" stroke-width="1.5"/>
+                <!-- Hand flicking paper -->
+                <rect x="205" y="110" width="45" height="60" fill="#ffea00" stroke="#1a1a1a" stroke-width="2" transform="rotate(15 227 140)"/>
+                <circle cx="230" cy="135" r="10" fill="#800080" stroke="#1a1a1a" stroke-width="1"/>
+                <text x="230" y="139" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="7" font-weight="700" text-anchor="middle">МӨР</text>
+
+                <!-- Kozha's finger snapping Zhantas's nose! -->
+                <g transform="translate(240, 95)">
+                  <!-- Kozha's clenched fist & flicking middle finger -->
+                  <rect x="30" y="10" width="45" height="30" fill="#e0a370" stroke="#1a1a1a" stroke-width="2.5" rx="5"/>
+                  <line x1="30" y1="20" x2="-25" y2="22" stroke="#e0a370" stroke-width="10" stroke-linecap="round"/>
+                  <!-- Impact shockwaves on nose -->
+                  <path d="M-30 10 L-40 5 M-35 22 L-48 22 M-30 34 L-40 40" stroke="#e63b2e" stroke-width="3"/>
+                </g>
+              </svg>
+            `
+          },
+          {
+            span: "panel-span-6",
+            number: "5.2 КАДР",
+            title: "Майқанованың кабинетіндегі қақтығыс",
+            sfx: { type: "tars", text: "ТАРС!", style: "sfx-red", top: "15px", left: "20px" },
+            caption: { tag: "ӘДІЛЕТСІЗДІК", text: "«Мұғалімдер бөлмесіне аңқылдап кіріп бардым: — Лагерьге жолдама беріңізші маған! — Саған жолдама берілмейді. Біз ең алдымен үлгілі, тәртіпті оқушыларды жібереміз. — Жантас немене, менен артық болғаны ма? Майқанованың көкшіл көзі шатынап кетті: — Сен немене, мені тергегелі тұрсың ба?! Есікті бар күшіммен тарс жауып, жөнеле бердім!»" },
+            dialogues: [
+              { speaker: "Майқанова", role: "teacher", text: "— Қадыров! Бері кел! Тәртібің «үштік» бала лагерьге лайық емес!", type: "left" },
+              { speaker: "Қожа", role: "qozha", text: "— Бермесеңіз, қойыңыз! (Есікті тарс жауып, сыртта тұрған Жантастың мұрнынан тағы бірді шерттім!)", type: "right" }
+            ],
+            svg: `
+              <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="280" fill="#edebe4"/>
+                <!-- Teachers' Desk with stack of blue folders and red inkpot -->
+                <rect x="50" y="140" width="220" height="100" fill="#8c5835" stroke="#1a1a1a" stroke-width="3"/>
+                <rect x="70" y="120" width="70" height="20" fill="#0055ff" stroke="#1a1a1a" stroke-width="2"/>
+                <rect x="80" y="105" width="60" height="15" fill="#ffcc00" stroke="#1a1a1a" stroke-width="1.5"/>
+
+                <!-- Strict Teacher Sabira Maikanova -->
+                <circle cx="160" cy="80" r="28" fill="#edd0b7" stroke="#1a1a1a" stroke-width="3"/>
+                <!-- Tight strict hair bun -->
+                <circle cx="160" cy="45" r="12" fill="#2d1d14" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M136 70 Q160 52 184 70" fill="#2d1d14"/>
+                <!-- Severe Spectacles (Көзәйнек) -->
+                <rect x="145" y="72" width="12" height="10" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+                <rect x="163" y="72" width="12" height="10" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+                <line x1="157" y1="77" x2="163" y2="77" stroke="#1a1a1a" stroke-width="2.5"/>
+                <!-- Stern pointing finger -->
+                <path d="M185 130 L250 110" stroke="#edd0b7" stroke-width="10" stroke-linecap="round"/>
+                <line x1="250" y1="110" x2="265" y2="105" stroke="#1a1a1a" stroke-width="3"/>
+
+                <!-- Kozha slamming the wooden door -->
+                <rect x="360" y="20" width="110" height="220" fill="#c49a6c" stroke="#1a1a1a" stroke-width="4"/>
+                <!-- Heavy Door Handle -->
+                <rect x="375" y="125" width="25" height="8" fill="#1a1a1a"/>
+                <!-- Slam shockwaves -->
+                <path d="M350 40 L330 30 M345 80 L320 75 M340 140 L310 140 M345 190 L325 200" stroke="#e63b2e" stroke-width="4"/>
+                <!-- Kozha storming away resolutely -->
+                <circle cx="310" cy="160" r="25" fill="#e0a370" stroke="#1a1a1a" stroke-width="2.5"/>
+                <path d="M290 148 Q310 128 330 148" fill="#2d1d14"/>
+                <path d="M295 185 L325 185 L335 240 L285 240 Z" fill="#e63b2e" stroke="#1a1a1a" stroke-width="3"/>
+              </svg>
+            `
+          }
+        ]
+      }
+    ];
+
+    /* Character Dossier Data */
+    const charactersData = {
+      qozha: {
+        name: "Қожаберген Қадыров",
+        role: "Басты кейіпкер, «Қара Қожа», 5-сынып оқушысы",
+        desc: "Ақын жанды, сотқар, бірақ әділ бала. Әкесіз өскендіктен ішкі мұңы терең. Жантастың қулығына төзбейді, Майқановадан қаймықпай шындықты айтады. Үлкен жазушы болуды армандайды.",
+        stat1: "98%",
+        stat2: "45%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="45" r="28" fill="#e0a370" stroke="#1a1a1a" stroke-width="2.5"/><path d="M26 30 Q50 10 74 30" fill="#2d1d14"/><ellipse cx="50" cy="52" rx="4" ry="6" fill="#1a1a1a"/><circle cx="42" cy="40" r="3.5" fill="#1a1a1a"/><circle cx="58" cy="40" r="3.5" fill="#1a1a1a"/><path d="M42 62 Q50 68 58 62" stroke="#1a1a1a" stroke-width="2.5" fill="none"/></svg>`
+      },
+      zhantas: {
+        name: "Жантас",
+        role: "Қожаның сыныптасы, қарсыласы",
+        desc: "Пысық, қу, мұғалімдерге жағымпаздануға бейім. Сабақ үстінде сыбырлағыш, өзгенің кемшілігін шұқып көрсеткенді жақсы көреді. Қожаны «Қара Көже» деп мазақтайды.",
+        stat1: "30%",
+        stat2: "95%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="45" r="26" fill="#eed5b7" stroke="#1a1a1a" stroke-width="2.5"/><path d="M28 32 Q50 15 72 32" fill="#3a2b20"/><line x1="40" y1="42" x2="48" y2="44" stroke="#1a1a1a" stroke-width="2.5"/><line x1="52" y1="44" x2="60" y2="42" stroke="#1a1a1a" stroke-width="2.5"/><path d="M42 58 Q50 66 58 58" stroke="#e63b2e" stroke-width="2" fill="none"/></svg>`
+      },
+      maikanova: {
+        name: "Сәбира Майқанова",
+        role: "Қазақ тілі пәнінің мұғалімі, сынып жетекшісі",
+        desc: "Талапшыл, қатал педагог. Тәртіпке қатты мән береді. Қожаның жасырын таланты мен сезімталдығын түсінбей, көбіне оны тек «тәртіпсіз сотқар» ретінде қабылдайды.",
+        stat1: "80%",
+        stat2: "50%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="45" r="26" fill="#edd0b7" stroke="#1a1a1a" stroke-width="2.5"/><circle cx="50" cy="18" r="10" fill="#2d1d14"/><rect x="38" y="38" width="10" height="8" fill="none" stroke="#1a1a1a" stroke-width="2"/><rect x="52" y="38" width="10" height="8" fill="none" stroke="#1a1a1a" stroke-width="2"/><line x1="48" y1="42" x2="52" y2="42" stroke="#1a1a1a" stroke-width="2"/><line x1="42" y1="56" x2="58" y2="56" stroke="#1a1a1a" stroke-width="2"/></svg>`
+      },
+      zhanar: {
+        name: "Жанар",
+        role: "Сыныптың үздік оқушысы, өнерлі сұлу қыз",
+        desc: "Қызыл беретка киетін, әсем дауысты, биші қыз. Қожаның жасырын махаббаты. Оның мейірімділігі мен адалдығы Қожаны жақсы болуға, биікке ұмтылуға жетелейді.",
+        stat1: "70%",
+        stat2: "20%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="48" r="26" fill="#fcdbc9" stroke="#1a1a1a" stroke-width="2.5"/><ellipse cx="48" cy="24" rx="34" ry="12" fill="#e63b2e" stroke="#1a1a1a" stroke-width="2" transform="rotate(-8 48 24)"/><circle cx="42" cy="45" r="3.5" fill="#1a1a1a"/><circle cx="58" cy="45" r="3.5" fill="#1a1a1a"/><path d="M44 58 Q50 64 56 58" stroke="#e63b2e" stroke-width="2" fill="none"/></svg>`
+      },
+      millat: {
+        name: "Миллат ана",
+        role: "Қожаның анасы, колхоз сауыншысы, депутат",
+        desc: "Парасатты, сабырлы, намысты әйел. Күйеуінен айырылса да еңсесін тік ұстайды. Аудандық кеңестің депутаты. Ұлының еркелігіне қамығады, бірақ шексіз жақсы көреді.",
+        stat1: "90%",
+        stat2: "30%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="45" r="26" fill="#e8b593" stroke="#1a1a1a" stroke-width="2.5"/><path d="M30 35 Q50 18 70 35" fill="#1a1a1a"/><circle cx="42" cy="42" r="3" fill="#1a1a1a"/><circle cx="58" cy="42" r="3" fill="#1a1a1a"/><path d="M44 56 Q50 54 56 56" stroke="#1a1a1a" stroke-width="2" fill="none"/></svg>`
+      },
+      qaratai: {
+        name: "Қаратай",
+        role: "Көрші колхоздың комбайншысы, дәмелі күйеу",
+        desc: "Үш дөңгелекті мотоцикл мінген, әжімді, жесір комбайншы. Миллатқа көңіл білдіріп келеді, бірақ Қожаның қарсылығы мен Миллаттың салқын қабағынан ығады.",
+        stat1: "60%",
+        stat2: "70%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="45" r="26" fill="#d9986b" stroke="#1a1a1a" stroke-width="2.5"/><ellipse cx="50" cy="24" rx="30" ry="10" fill="#5c5042" stroke="#1a1a1a" stroke-width="2"/><path d="M36 50 Q50 65 64 50" fill="#3a2e24"/></svg>`
+      },
+      azhe: {
+        name: "Әжесі",
+        role: "Қожаның асыл әжесі, үйдің берекесі",
+        desc: "Ақ кимешегі желбіреген, күбі пісетін еңбекқор қарт ана. Немересін «тамтық неме» деп ұрсып отырып, барын аузына тосатын мейірім бұлағы.",
+        stat1: "85%",
+        stat2: "15%",
+        svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="48" r="24" fill="#e2b896" stroke="#1a1a1a" stroke-width="2"/><path d="M26 38 Q50 12 74 38 L80 90 L20 90 Z" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.5"/><ellipse cx="50" cy="48" rx="12" ry="14" fill="#e2b896"/><line x1="44" y1="44" x2="48" y2="45" stroke="#1a1a1a" stroke-width="1.5"/><line x1="52" y1="45" x2="56" y2="44" stroke="#1a1a1a" stroke-width="1.5"/></svg>`
+      }
+    };
+
+    /* State variables */
+    let currentSceneIndex = 1;
+    let readingMode = 'grid'; // 'grid' or 'cinema'
+    let currentCinemaFrame = 0;
+
+    /* Initialize UI */
+    function renderCurrentScene() {
+      const container = document.getElementById('sceneContainer');
+      if (!container) return;
+
+      const scene = scenesData.find(s => s.id === currentSceneIndex);
+      if (!scene) return;
+
+      // Update Tabs active state
+      for (let i = 1; i <= scenesData.length; i++) {
+        const tab = document.getElementById(`tab-scene-${i}`);
+        if (tab) {
+          if (i === currentSceneIndex) {
+            tab.classList.add('active');
+          } else {
+            tab.classList.remove('active');
+          }
+        }
+      }
+
+      if (readingMode === 'grid') {
+        // GRID VIEW: Show all panels in full comic page layout
+        let panelsHtml = '';
+        scene.panels.forEach((panel, pIdx) => {
+          let dialoguesHtml = '';
+          panel.dialogues.forEach(d => {
+            if (d.type === 'thought') {
+              dialoguesHtml += `
+                <div class="thought-bubble">
+                  <span class="thought-tag">Қожаның ойы:</span>
+                  ${d.text}
+                </div>
+              `;
+            } else {
+              dialoguesHtml += `
+                <div class="speech-bubble ${d.type}">
+                  <div class="bubble-speaker ${d.role}">${d.speaker}</div>
+                  <div>${d.text}</div>
+                </div>
+              `;
+            }
+          });
+
+          panelsHtml += `
+            <article class="comic-panel ${panel.span}" id="panel-${scene.id}-${pIdx}">
+              <div class="panel-header-strip">
+                <span>${panel.number}: ${panel.title}</span>
+                <span style="color:var(--tertiary);">Б. Соқпақбаев</span>
+              </div>
+
+              <div class="panel-art-frame">
+                ${panel.svg}
+                <button class="sfx-badge ${panel.sfx.style}"
+                        style="top:${panel.sfx.top || 'auto'}; bottom:${panel.sfx.bottom || 'auto'}; left:${panel.sfx.left || 'auto'}; right:${panel.sfx.right || 'auto'};"
+                        onclick="animateSfxBadge(this, '${panel.sfx.type}')"
+                        title="Дыбысты ойнату үшін басыңыз!">
+                  <i data-lucide="zap" style="width:16px;height:16px;"></i> ${panel.sfx.text}
+                </button>
+              </div>
+
+              <div class="caption-box">
+                <span class="caption-tag">${panel.caption.tag}</span>
+                ${panel.caption.text}
+              </div>
+
+              <div class="dialogue-flow">
+                ${dialoguesHtml}
+              </div>
+            </article>
+          `;
+        });
+
+        container.innerHTML = `
+          <div class="scene-header">
+            <div class="scene-title-group">
+              <span class="comic-badge red">${scene.panels.length} КАДРЛЫҚ КОМИКС БЕТІ</span>
+              <h2>${scene.title}</h2>
+              <div class="scene-subtitle">${scene.subtitle}</div>
+            </div>
+            <div class="btn-group">
+              ${currentSceneIndex > 1 ? `<button class="comic-btn" onclick="switchScene(${currentSceneIndex - 1})"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Алдыңғы тарау</button>` : ''}
+              ${currentSceneIndex < scenesData.length ? `<button class="comic-btn accent-red" onclick="switchScene(${currentSceneIndex + 1})">Келесі тарау <i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>` : ''}
+            </div>
+          </div>
+
+          <div class="comic-panels-grid">
+            ${panelsHtml}
+          </div>
+        `;
+
+      } else {
+        // CINEMATIC MODE: Focus on single panel
+        const panel = scene.panels[currentCinemaFrame] || scene.panels[0];
+
+        let dialoguesHtml = '';
+        panel.dialogues.forEach(d => {
+          if (d.type === 'thought') {
+            dialoguesHtml += `
+              <div class="thought-bubble" style="font-size:1.05rem;max-width:85%;">
+                <span class="thought-tag">Қожаның ойы:</span>
+                ${d.text}
+              </div>
+            `;
+          } else {
+            dialoguesHtml += `
+              <div class="speech-bubble ${d.type}" style="font-size:1.05rem;max-width:85%;">
+                <div class="bubble-speaker ${d.role}">${d.speaker}</div>
+                <div>${d.text}</div>
+              </div>
+            `;
+          }
+        });
+
+        container.innerHTML = `
+          <div class="scene-header">
+            <div class="scene-title-group">
+              <span class="comic-badge blue">КИНО-РЕЖИМ: ${panel.number} / ${scene.panels.length}</span>
+              <h2>${panel.title}</h2>
+              <div class="scene-subtitle">${scene.title}</div>
+            </div>
+            <button class="comic-btn" onclick="setReadingMode('grid')">
+              <i data-lucide="grid" style="width:16px;height:16px;"></i> Барлық кадрларды көру
+            </button>
+          </div>
+
+          <div class="cinematic-stage">
+            <article class="comic-panel" id="cinemaPanelFrame" style="box-shadow:var(--offset-shadow-lg);">
+              <div class="panel-header-strip">
+                <span>${panel.number} • ${panel.title}</span>
+                <span>Қожаның повестiнен үзінді</span>
+              </div>
+
+              <div class="panel-art-frame" style="min-height:360px;">
+                ${panel.svg}
+                <button class="sfx-badge ${panel.sfx.style}"
+                        style="top:${panel.sfx.top || 'auto'}; bottom:${panel.sfx.bottom || 'auto'}; left:${panel.sfx.left || 'auto'}; right:${panel.sfx.right || 'auto'}; font-size:1.8rem;"
+                        onclick="animateSfxBadge(this, '${panel.sfx.type}')"
+                        title="Дыбысты ойнату!">
+                  <i data-lucide="zap" style="width:20px;height:20px;"></i> ${panel.sfx.text}
+                </button>
+              </div>
+
+              <div class="caption-box" style="font-size:1rem;padding:var(--space-md);">
+                <span class="caption-tag" style="font-size:0.8rem;">${panel.caption.tag}</span>
+                ${panel.caption.text}
+              </div>
+
+              <div class="dialogue-flow" style="padding:var(--space-lg);">
+                ${dialoguesHtml}
+              </div>
+            </article>
+          </div>
+        `;
+
+        // Update cinema pips
+        renderCinemaPips(scene.panels.length);
+      }
+
+      // Re-initialize Lucide Icons on dynamic HTML
+      window.lucide?.createIcons();
+    }
+
+    function renderCinemaPips(total) {
+      const pipsContainer = document.getElementById('cinemaPips');
+      if (!pipsContainer) return;
+      let pips = '';
+      for (let i = 0; i < total; i++) {
+        pips += `<div class="step-pip ${i === currentCinemaFrame ? 'active' : ''}" onclick="goToCinemaFrame(${i})" title="${i + 1}-кадр"></div>`;
+      }
+      pipsContainer.innerHTML = pips;
+    }
+
+    function switchScene(sceneId) {
+      currentSceneIndex = sceneId;
+      currentCinemaFrame = 0;
+      renderCurrentScene();
+      updateDiaryPrompt();
+      const container = document.getElementById('sceneContainer');
+      if (container) {
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function setReadingMode(mode) {
+      readingMode = mode;
+      const gridBtn = document.getElementById('modeGridBtn');
+      const cinemaBtn = document.getElementById('modeCinemaBtn');
+      const cinemaDock = document.getElementById('cinemaDock');
+
+      if (mode === 'grid') {
+        if (gridBtn) gridBtn.classList.add('active');
+        if (cinemaBtn) cinemaBtn.classList.remove('active');
+        if (cinemaDock) cinemaDock.style.display = 'none';
+      } else {
+        if (gridBtn) gridBtn.classList.remove('active');
+        if (cinemaBtn) cinemaBtn.classList.add('active');
+        if (cinemaDock) cinemaDock.style.display = 'flex';
+      }
+      renderCurrentScene();
+    }
+
+    function prevCinemaFrame() {
+      const scene = scenesData.find(s => s.id === currentSceneIndex);
+      if (!scene) return;
+      if (currentCinemaFrame > 0) {
+        currentCinemaFrame--;
+        renderCurrentScene();
+      } else if (currentSceneIndex > 1) {
+        currentSceneIndex--;
+        const prevScene = scenesData.find(s => s.id === currentSceneIndex);
+        currentCinemaFrame = prevScene ? prevScene.panels.length - 1 : 0;
+        renderCurrentScene();
+      }
+    }
+
+    function nextCinemaFrame() {
+      const scene = scenesData.find(s => s.id === currentSceneIndex);
+      if (!scene) return;
+      if (currentCinemaFrame < scene.panels.length - 1) {
+        currentCinemaFrame++;
+        renderCurrentScene();
+      } else if (currentSceneIndex < scenesData.length) {
+        currentSceneIndex++;
+        currentCinemaFrame = 0;
+        renderCurrentScene();
+      }
+    }
+
+    function goToCinemaFrame(idx) {
+      currentCinemaFrame = idx;
+      renderCurrentScene();
+    }
+
+    function triggerCurrentSfx() {
+      const scene = scenesData.find(s => s.id === currentSceneIndex);
+      if (!scene) return;
+      const panel = scene.panels[currentCinemaFrame] || scene.panels[0];
+      if (panel && panel.sfx) {
+        playSfx(panel.sfx.type);
+        const frame = document.getElementById('cinemaPanelFrame') || document.getElementById('sceneContainer');
+        if (frame) {
+          frame.classList.remove('panel-flash');
+          void frame.offsetWidth;
+          frame.classList.add('panel-flash');
+        }
+      }
+    }
+
+    /* Character Selection */
+    function selectChar(charKey, clickEvent) {
+      const char = charactersData[charKey];
+      if (!char) return;
+
+      // Update buttons
+      const chips = document.querySelectorAll('.char-chip');
+      chips.forEach(c => c.classList.remove('active'));
+      const activeBtn = clickEvent?.currentTarget || Array.from(chips).find(chip => chip.textContent.trim() === char.name);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const nameEl = document.getElementById('charName');
+      const roleEl = document.getElementById('charRole');
+      const descEl = document.getElementById('charDesc');
+      const avatarEl = document.getElementById('charAvatarSlot');
+      const stat1El = document.getElementById('charStat1');
+      const stat2El = document.getElementById('charStat2');
+
+      if (nameEl) nameEl.textContent = char.name;
+      if (roleEl) roleEl.textContent = char.role;
+      if (descEl) descEl.textContent = char.desc;
+      if (avatarEl) avatarEl.innerHTML = char.svg;
+      if (stat1El) stat1El.style.width = char.stat1;
+      if (stat2El) stat2El.style.width = char.stat2;
+    }
+
+    /* Kozha's Interactive Diary Dilemmas */
+    const diaryPrompts = {
+      1: "«Өлеңімді журналға баспай қойғанда, қатты қапаландым. Бірақ мен сынып қалмай, үлкен повесть жазуға бекіндім. Қалай ойлайсыз, бұл батылдық па, әлде құр қиял ма?»",
+      2: "«Менің атым — Қожа. Атым да, басым да, танауым да басқаларға ұқсамайды. Кейде осы кемшілігім үшін өзімді кінәлаймын... Менің осы ойыммен келісесіз бе?»",
+      3: "«Қаратайдың үш дөңгелекті тәжалы есік алдына келгенде, мамамды қызғанып, дөңгелекті теуіп жібердім. Менің осы қызғанышым орынды ма?»",
+      4: "«Жанардың құмдағы ізін көріп, жүрегім лүпілдеп кетті. Оған сезімімді қашан және қалай білдіргенім дұрыс болар еді?»",
+      5: "«Майқанова маған жолдама бермей, Жантасқа берді. Жантастың мұрнынан шертіп, есікті тарс жауып кеттім. Менің бұл әрекетім дұрыс болды ма?»"
+    };
+
+    function updateDiaryPrompt() {
+      const promptEl = document.getElementById('diaryPrompt');
+      const responseEl = document.getElementById('dilemmaResponse');
+      if (promptEl) {
+        promptEl.textContent = diaryPrompts[currentSceneIndex] || diaryPrompts[1];
+      }
+      if (responseEl) {
+        responseEl.style.display = 'none';
+      }
+    }
+
+    function chooseDilemma(choiceNum) {
+      const responseEl = document.getElementById('dilemmaResponse');
+      if (!responseEl) return;
+
+      let feedback = '';
+      if (choiceNum === 1) {
+        feedback = `<strong>Қожаның жауабы:</strong> «Дәл таптыңыз! Мен де солай ойладым! Мақтаншақ Жантасқа сол керек. Әйтпесе аузы қисайып, төбемізге шығайын деді ғой. Әттең, бірақ Майқанова мұны «тәртіпсіздік» деп түсінді...»`;
+      } else if (choiceNum === 2) {
+        feedback = `<strong>Қожаның жауабы:</strong> «Сіздің сөзіңіздің де жаны бар... Ашу үстінде бойымды билей алмай қалдым. Сабыр сақтағанда, бәлкім, Майқанова менің сабақ үлгеріміме қарап ойланар ма еді. Бірақ мен сотқар болсам да, өтірік жағымпаздана алмаймын!»`;
+      } else {
+        feedback = `<strong>Қожаның жауабы:</strong> «Иә, есікті тарс жауып, жөнеп кеткенім мұғалімге деген үлкен құрметсіздік болып көрінді. Сол үшін бұрышқа қамап, жиналыста талқыға салды ғой. Бірақ әділетсіздікті көргенде шыдай алмадым!»`;
+      }
+
+      responseEl.innerHTML = feedback;
+      responseEl.style.display = 'block';
+      playSfx('shyrq');
+    }
+
+    /* Keyboard navigation for comic frames */
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowRight') {
+        if (readingMode === 'cinema') nextCinemaFrame();
+      } else if (e.key === 'ArrowLeft') {
+        if (readingMode === 'cinema') prevCinemaFrame();
+      } else if (e.key === ' ') {
+        if (readingMode === 'cinema') {
+          e.preventDefault();
+          triggerCurrentSfx();
+        }
+      }
+    });
+
+    /* Initial Load */
+    document.addEventListener('DOMContentLoaded', function() {
+      renderCurrentScene();
+      selectChar('qozha');
+      window.lucide?.createIcons();
+    });
+  </script>
+</body>
+</html>
